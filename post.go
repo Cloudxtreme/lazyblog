@@ -3,11 +3,8 @@ package lazyblog
 import (
 	"encoding/base64"
 	"math/rand"
-	"regexp"
 	"strings"
 )
-
-var re = regexp.MustCompile("[^a-z0-9]+")
 
 // Post is the struct that represents our post data. It works for the two types
 // of data we store: the raw data that is passed to an HTML template, and the
@@ -36,6 +33,8 @@ func Urlify(id string) []byte {
 	for _, b := range buf {
 		if (b >= 48 && b <= 57) || (b >= 65 && b <= 90) || (b >= 97 && b <= 122) {
 			bytebuf = append(bytebuf, b)
+		} else if b == 32 {
+			bytebuf = append(bytebuf, '-')
 		}
 	}
 	bytebuf = append(bytebuf, []byte(NewID())...) // worst syntax ever lol
