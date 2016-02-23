@@ -15,16 +15,6 @@ type Post struct {
 	Body []byte
 }
 
-func seed() []byte {
-	buf := make([]byte, 6)
-	_, err := rand.Read(buf)
-	if err != nil {
-		// couldn't read from PRNG, so panic
-		panic(err)
-	}
-	return buf
-}
-
 // NewID is the math one
 func NewID() string {
 	buf := make([]byte, 6)
