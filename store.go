@@ -32,6 +32,8 @@ func SetPost(w http.ResponseWriter, post *Post) {
 
 	// save to each store. might get some speed gain if you do each inside a
 	// goroutine
+	//
+	// investigate whether or not using `batch` could improve perf here
 	DefaultStore.Update(func(tx *bolt.Tx) error {
 		raw := tx.Bucket(_raw)
 		rendered := tx.Bucket(_rendered)
@@ -51,7 +53,7 @@ func SetPost(w http.ResponseWriter, post *Post) {
 func GetPost(id []byte) []byte {
 	var buf []byte
 	DefaultStore.View(func(tx *bolt.Tx) error {
-		rendered := tx.Bucket([]byte(_rendered)) // i need to make these constants
+		rendered := tx.Bucket([]byte(_rendered))
 		buf = rendered.Get(id)
 		return nil
 	})
