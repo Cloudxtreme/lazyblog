@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-var t = template.Must(template.ParseGlob("templates/*"))
+var t = template.Must(template.ParseGlob("cmd/templates/*"))
 
 // IndexHandler serves the home page.
 func IndexHandler(w http.ResponseWriter, r *http.Request) {

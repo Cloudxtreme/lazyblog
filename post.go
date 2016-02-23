@@ -1,15 +1,8 @@
 package lazyblog
 
 import (
-	"crypto/rand"
 	"encoding/base64"
-	"strconv"
-)
-
-// counter is incremented every time an id generated
-var (
-	counter = 0
-	prng    = seed()
+	"math/rand"
 )
 
 // Post is the struct that represents our post data. It works for the two types
@@ -32,10 +25,9 @@ func seed() []byte {
 	return buf
 }
 
-// NewID generates a new id
-func NewID() []byte {
-	// some weird suff in here, may refactor
-	id := append(prng, []byte(strconv.Itoa(counter))...)
-	counter++
-	return []byte(base64.URLEncoding.EncodeToString(id))
+// NewID is the math one
+func NewID() string {
+	buf := make([]byte, 6)
+	rand.Read(buf)
+	return base64.URLEncoding.EncodeToString(buf)
 }
