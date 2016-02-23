@@ -1,4 +1,4 @@
-package main
+package lazyblog
 
 import (
 	"html/template"

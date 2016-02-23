@@ -2,6 +2,8 @@ package main
 
 import (
 	"net/http"
+
+	"github.com/bentranter/lazyblog"
 )
 
 func main() {
@@ -9,7 +11,7 @@ func main() {
 	mux := http.NewServeMux()
 
 	// Routes
-	mux.HandleFunc("/", IndexHandler)
+	mux.HandleFunc("/", lazyblog.IndexHandler)
 
 	// Server static files
 	mux.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
