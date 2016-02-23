@@ -8,6 +8,11 @@ import (
 	"github.com/boltdb/bolt"
 )
 
+var (
+	_raw      = []byte("raw")
+	_rendered = []byte("rendered")
+)
+
 // DefaultStore @Todo
 var DefaultStore = NewDefaultStore()
 
@@ -28,8 +33,8 @@ func SetPost(w http.ResponseWriter, post *Post) {
 	// save to each store. might get some speed gain if you do each inside a
 	// goroutine
 	DefaultStore.Update(func(tx *bolt.Tx) error {
-		raw := tx.Bucket([]byte("raw"))
-		rendered := tx.Bucket([]byte("rendered"))
+		raw := tx.Bucket(_raw)
+		rendered := tx.Bucket(_rendered)
 
 		err = raw.Put(post.ID, post.Body)
 		if err != nil {
@@ -46,7 +51,7 @@ func SetPost(w http.ResponseWriter, post *Post) {
 func GetPost(id []byte) []byte {
 	var buf []byte
 	DefaultStore.View(func(tx *bolt.Tx) error {
-		rendered := tx.Bucket([]byte("rendered")) // i need to make these constants
+		rendered := tx.Bucket([]byte(_rendered)) // i need to make these constants
 		buf = rendered.Get(id)
 		return nil
 	})
@@ -70,12 +75,12 @@ func NewDefaultStore() *bolt.DB {
 	// make two buckets: one for raw post data, another for compiled templates
 	db.Update(func(tx *bolt.Tx) error {
 		// we don't care about the returned bucket, so ignore it
-		_, err := tx.CreateBucketIfNotExists([]byte("raw"))
+		_, err := tx.CreateBucketIfNotExists(_raw)
 		if err != nil {
 			return err
 		}
 
-		_, err = tx.CreateBucketIfNotExists([]byte("rendered"))
+		_, err = tx.CreateBucketIfNotExists(_rendered)
 		if err != nil {
 			return err
 		}
