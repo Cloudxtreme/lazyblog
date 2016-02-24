@@ -2,7 +2,7 @@ package lazyblog
 
 import (
 	"bytes"
-	"encoding/binary"
+	"encoding/json"
 	"log"
 	"net/http"
 	"time"
@@ -21,12 +21,15 @@ var DefaultStore = NewDefaultStore()
 // SetPost creates a new post. It will save two versions of the post: a "raw"
 // version, containg the id and the body, and a "rendered" version, containing
 // the id and the rendered and compressed HTML for that post.
-func SetPost(w http.ResponseWriter, post *Post) {
+func SetPost(w http.ResponseWriter, post *PostJSON) {
 	// immediately write the response so the client feels snappy
 	// this should be a buffer pool, and response should be gzipped first!
 	var buf bytes.Buffer
-	t.ExecuteTemplate(&buf, "new", post)
-	_, err := buf.WriteTo(w)
+	err := t.ExecuteTemplate(&buf, "post", post)
+	if err != nil {
+		log.Fatalln("Error executing: ", err)
+	}
+	_, err = buf.WriteTo(w)
 	if err != nil {
 		// not sure what to do with this yet... I guess don't write it to the
 		// store at least?
@@ -37,17 +40,17 @@ func SetPost(w http.ResponseWriter, post *Post) {
 		raw := tx.Bucket(_raw)
 		rendered := tx.Bucket(_rendered)
 
-		// this will never error under an "update" transaction, so it's safe to
-		// ignore this error
-		id, _ := raw.NextSequence()
-		post.ID = append(post.ID, itob(id)...)
-
-		err = raw.Put(post.ID, post.Body)
+		postJSON, err := json.Marshal(post)
 		if err != nil {
 			return err
 		}
 
-		return rendered.Put(post.ID, buf.Bytes())
+		err = raw.Put([]byte(post.ID), postJSON)
+		if err != nil {
+			return err
+		}
+
+		return rendered.Put([]byte(post.ID), buf.Bytes())
 	})
 
 }
@@ -67,17 +70,16 @@ func GetPost(id []byte) []byte {
 
 // GetAll retrieves every post from the database. You probably don't want to
 // use this -- use GetPosts instead.
-func GetAll() []*Post {
-	var posts []*Post
+func GetAll() []*PostJSON {
+	var posts []*PostJSON
 	DefaultStore.View(func(tx *bolt.Tx) error {
-		rendered := tx.Bucket(_rendered)
-		c := rendered.Cursor()
+		raw := tx.Bucket(_raw)
+		c := raw.Cursor()
 
-		for id, body := c.First(); id != nil; id, body = c.Next() {
-			posts = append(posts, &Post{
-				ID:   id,
-				Body: body,
-			})
+		for id, postJSON := c.First(); id != nil; id, postJSON = c.Next() {
+			var post *PostJSON
+			json.Unmarshal(postJSON, &post)
+			posts = append(posts, post)
 		}
 		return nil
 	})
@@ -114,13 +116,4 @@ func NewDefaultStore() *bolt.DB {
 	})
 
 	return db
-}
-
-// itob is a utility for converting uint64s to []bytes. I *think* your
-// system's endian-ness doesn't matter since Bolt will know what to do either
-// way.
-func itob(v uint64) []byte {
-	b := make([]byte, 8)
-	binary.BigEndian.PutUint64(b, v)
-	return b
 }

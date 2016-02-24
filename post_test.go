@@ -14,6 +14,7 @@ func BenchmarkNewID(b *testing.B) {
 func TestUrlify(t *testing.T) {
 	str := Urlify("mytest$1234+===((()")
 	str2 := Urlify("my test with spaces")
+
 	if !strings.Contains(string(str), "mytest1234") {
 		t.Errorf("Didn't pass, got %s, expected mytest1234\n", str)
 	}

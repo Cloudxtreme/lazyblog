@@ -1,32 +1,40 @@
 package lazyblog
 
 import (
-	"encoding/base64"
-	"math/rand"
+	"encoding/hex"
+	"math/big"
 	"strings"
+	"time"
 )
 
-// Post is the struct that represents our post data. It works for the two types
-// of data we store: the raw data that is passed to an HTML template, and the
-// rendered and compressed data that we show to the user.
-//
-// In the future, it's likely we'll add a comments field to this struct.
+// Post is the struct that represents the cached version of our post data. The
+// ID is the same as the ID for a Post's PostJSON, and the body is the entire
+// compiled HTML template.
 type Post struct {
-	ID   []byte
+	ID   string
 	Body []byte
 }
 
-// NewID is the math one
+// PostJSON is the struct that represents our "raw" data.
+type PostJSON struct {
+	ID          string
+	Title       string
+	Body        string
+	DateCreated time.Time
+}
+
+// NewID base16 encodes the current time, to be used along with the Urlify'd
+// Post title in order generate a usable ID for each post. BoltDB orders it's
+// data by byte order, so this ID is used to order posts from oldest to newest.
 func NewID() string {
-	buf := make([]byte, 6)
-	rand.Read(buf)
-	return base64.URLEncoding.EncodeToString(buf)
+	now := big.NewInt(time.Now().Unix()).Bytes()
+	return hex.EncodeToString(now)
 }
 
 // Urlify is a utility for making strings URL safe. It removes anything that
-// isn't a number of letter, and replaces each with a `-`. It then generates
-// an id and appends it to the end of the string.
-func Urlify(id string) []byte {
+// isn't a number or letter, and replaces each with a `-`. It then appends a
+// single "-" to the end.
+func Urlify(id string) string {
 	id = strings.ToLower(id)
 	buf := []byte(id)
 	var bytebuf []byte
@@ -37,6 +45,6 @@ func Urlify(id string) []byte {
 			bytebuf = append(bytebuf, '-')
 		}
 	}
-	bytebuf = append(bytebuf, []byte(NewID())...) // worst syntax ever lol
-	return bytebuf
+	bytebuf = append(bytebuf, '-')
+	return string(bytebuf)
 }

@@ -5,9 +5,12 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 )
 
-var t = template.Must(template.ParseGlob("templates/*"))
+const path = "/Users/bentranter/Go/src/github.com/bentranter/lazyblog/cmd/templates/*"
+
+var t = template.Must(template.ParseGlob(path))
 
 // IndexHandler serves the home page.
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
@@ -33,9 +36,12 @@ func NewPostHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	case "POST":
 		r.ParseForm()
-		post := &Post{
-			ID:   []byte(r.FormValue("id")),
-			Body: []byte(r.FormValue("body")),
+		title := r.FormValue("title")
+		post := &PostJSON{
+			ID:          Urlify(title) + NewID(),
+			Title:       title,
+			Body:        r.FormValue("body"),
+			DateCreated: time.Now(),
 		}
 		SetPost(w, post)
 	}
