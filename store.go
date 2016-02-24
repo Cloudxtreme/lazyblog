@@ -2,6 +2,8 @@ package lazyblog
 
 import (
 	"bytes"
+	"encoding/binary"
+	"log"
 	"net/http"
 	"time"
 
@@ -23,20 +25,22 @@ func SetPost(w http.ResponseWriter, post *Post) {
 	// immediately write the response so the client feels snappy
 	// this should be a buffer pool, and response should be gzipped first!
 	var buf bytes.Buffer
-	t.ExecuteTemplate(&buf, "index", post)
+	t.ExecuteTemplate(&buf, "new", post)
 	_, err := buf.WriteTo(w)
 	if err != nil {
 		// not sure what to do with this yet... I guess don't write it to the
 		// store at least?
+		log.Println("Error: ", err)
 	}
 
-	// save to each store. might get some speed gain if you do each inside a
-	// goroutine
-	//
-	// investigate whether or not using `batch` could improve perf here
 	DefaultStore.Update(func(tx *bolt.Tx) error {
 		raw := tx.Bucket(_raw)
 		rendered := tx.Bucket(_rendered)
+
+		// this will never error under an "update" transaction, so it's safe to
+		// ignore this error
+		id, _ := raw.NextSequence()
+		post.ID = append(post.ID, itob(id)...)
 
 		err = raw.Put(post.ID, post.Body)
 		if err != nil {
@@ -53,12 +57,31 @@ func SetPost(w http.ResponseWriter, post *Post) {
 func GetPost(id []byte) []byte {
 	var buf []byte
 	DefaultStore.View(func(tx *bolt.Tx) error {
-		rendered := tx.Bucket([]byte(_rendered))
+		rendered := tx.Bucket(_rendered)
 		buf = rendered.Get(id)
 		return nil
 	})
 
 	return buf
+}
+
+// GetAll retrieves every post from the database. You probably don't want to
+// use this -- use GetPosts instead.
+func GetAll() []*Post {
+	var posts []*Post
+	DefaultStore.View(func(tx *bolt.Tx) error {
+		rendered := tx.Bucket(_rendered)
+		c := rendered.Cursor()
+
+		for id, body := c.First(); id != nil; id, body = c.Next() {
+			posts = append(posts, &Post{
+				ID:   id,
+				Body: body,
+			})
+		}
+		return nil
+	})
+	return posts
 }
 
 // NewDefaultStore creates our store if it doesn't already exist. We also
@@ -91,4 +114,13 @@ func NewDefaultStore() *bolt.DB {
 	})
 
 	return db
+}
+
+// itob is a utility for converting uint64s to []bytes. I *think* your
+// system's endian-ness doesn't matter since Bolt will know what to do either
+// way.
+func itob(v uint64) []byte {
+	b := make([]byte, 8)
+	binary.BigEndian.PutUint64(b, v)
+	return b
 }

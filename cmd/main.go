@@ -12,6 +12,8 @@ func main() {
 
 	// Routes
 	mux.HandleFunc("/", lazyblog.IndexHandler)
+	mux.HandleFunc("/new", lazyblog.NewPostHandler)
+	mux.HandleFunc("/posts", lazyblog.GetPostHandler)
 
 	// Server static files
 	mux.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))

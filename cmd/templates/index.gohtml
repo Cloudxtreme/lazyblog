@@ -1,4 +1,8 @@
 {{ define "index" }}{{ template "header" . }}
 <main>
   <h1>Home page</h1>
+  {{ range . }}
+    <h3><a href="/{{ .ID }}">{{ .ID }}</a></h3>
+    <p>{{ .Body }}</p>
+  {{ end }}
 </main>{{ template "footer" }}{{ end }}
