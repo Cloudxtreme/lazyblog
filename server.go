@@ -61,6 +61,15 @@ func NewPostSubmit(w http.ResponseWriter, r *http.Request, _ httprouter.Params) 
 	SetPost(w, post)
 }
 
+type httprouterHandler func(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
+
+// AuthenticatedRoute protects the route
+func AuthenticatedRoute(next httprouterHandler) httprouter.Handle {
+	return httprouter.Handle(func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+		next(w, r, ps)
+	})
+}
+
 // NewDefaultMux returns the router with its routes already initialized.
 func NewDefaultMux() *httprouter.Router {
 	// Create a new serve mux
