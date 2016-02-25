@@ -29,12 +29,6 @@ func SetPost(w http.ResponseWriter, post *PostJSON) {
 	if err != nil {
 		log.Fatalln("Error executing: ", err)
 	}
-	_, err = buf.WriteTo(w)
-	if err != nil {
-		// not sure what to do with this yet... I guess don't write it to the
-		// store at least?
-		log.Println("Error: ", err)
-	}
 
 	DefaultStore.Update(func(tx *bolt.Tx) error {
 		raw := tx.Bucket(_raw)
@@ -53,15 +47,23 @@ func SetPost(w http.ResponseWriter, post *PostJSON) {
 		return rendered.Put([]byte(post.ID), buf.Bytes())
 	})
 
+	// Ideally this would happen before we touch the buckets, but:
+	//     1. It's good to check for errors
+	//     2. Calling `writeTo` drains the buffer.
+	// So idk what to yet
+	_, err = buf.WriteTo(w)
+	if err != nil {
+		log.Println("Error: ", err)
+	}
 }
 
 // GetPost retrieves the post body given its id, and returns it as a byte
 // slice.
-func GetPost(id []byte) []byte {
+func GetPost(id string) []byte {
 	var buf []byte
 	DefaultStore.View(func(tx *bolt.Tx) error {
 		rendered := tx.Bucket(_rendered)
-		buf = rendered.Get(id)
+		buf = rendered.Get([]byte(id))
 		return nil
 	})
 
