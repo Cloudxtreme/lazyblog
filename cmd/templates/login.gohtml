@@ -1,0 +1,10 @@
+{{ define "login" }}{{ template "header" . }}
+<main class="px2">
+  <h1>Login my friend</h1>
+  <form action="/admin/login" method="POST">
+    <input type="text" name="username" placeholder="Username" autofocus="true" required="true">
+    <br>
+    <input type="password" name="password" placeholder="Password" required="true">
+    <input class="btn" type="submit" value="Submit">
+  </form>
+</main>{{ template "footer" }}{{ end }}

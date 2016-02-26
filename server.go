@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/julienschmidt/httprouter"
+	"golang.org/x/crypto/bcrypt"
 )
 
 const (
@@ -73,7 +74,36 @@ func AuthenticatedRoute(next httprouterHandler) httprouter.Handle {
 
 // AdminHandler serves the admin page.
 func AdminHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	// @TODO
+}
 
+// LoginHandler serves the admin login page.
+func LoginHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	err := t.ExecuteTemplate(w, "login", nil)
+	if err != nil {
+		log.Printf("Error rendering login template: ", err.Error())
+	}
+}
+
+// LoginPostHandler handles the user's login request. If their password is
+// incorrect, they're redirected to the login page with a flash message
+// informiang them what went wrong. If their password is correct, they're given
+// a JSON web token and redirected to the admin page.
+func LoginPostHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	r.ParseForm()
+	username := r.FormValue("username")
+	password := r.FormValue("password")
+	hashedPassword := GetUser(username)
+
+	err := bcrypt.CompareHashAndPassword(hashedPassword, []byte(password))
+	if err != nil {
+		// @TODO: should redirect with flash message for v0.1.0
+		http.Redirect(w, r, "/admin/login", http.StatusFound)
+		return
+	}
+
+	// Issue the authenticated user a token
+	w.Write([]byte("Good credentials"))
 }
 
 // NewDefaultMux returns the router with its routes already initialized.
@@ -85,9 +115,12 @@ func NewDefaultMux() *httprouter.Router {
 	r.GET("/", HomeHandler)
 	r.GET("/new", NewPostHandler)
 	r.GET("/posts/:id", GetPostHandler)
+	r.GET("/admin/login", LoginHandler)
 
+	r.POST("/admin/login", LoginPostHandler)
+
+	// Authenticated routes
 	r.POST("/new", NewPostSubmitHandler)
-	r.GET("/what", AuthenticatedRoute(GetPostHandler)) // it works y'all
 
 	// Server static files
 	r.ServeFiles("/assets/*filepath", http.Dir(assetPath))

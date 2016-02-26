@@ -90,10 +90,28 @@ func GetAll() []*PostJSON {
 	return posts
 }
 
+// GetUser returns the hashed password for the given username.
+func GetUser(username string) []byte {
+	var buf []byte
+	DefaultStore.View(func(tx *bolt.Tx) error {
+		users := tx.Bucket(_users)
+		buf = users.Get([]byte(username))
+		return nil
+	})
+
+	return buf
+}
+
 // Setup runs our setup process. If the user hasn't run the code before, it
 // will create a new user account with the given username and password. If the
 // user has, it will requre that username and password before starting. Idk if
 // this is a good idea or not, so I'm open to feedback.
+//
+// @TODO before v0.1.0:
+//
+// On second thought, this sucks for users who plan to use systemd or launchd
+// or upstart or whatever windows servers use since you can't use the default
+// script to start your app... so I need to change this.
 func Setup(username string, password string) {
 	if username == "" || password == "" {
 		log.Fatalln("You must provide a username and password") // should use os.Exit
