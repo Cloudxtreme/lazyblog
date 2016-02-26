@@ -1,11 +1,15 @@
 package lazyblog
 
 import (
+	"crypto/rand"
+	"encoding/base64"
+	"errors"
 	"html/template"
 	"log"
 	"net/http"
 	"time"
 
+	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/julienschmidt/httprouter"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -16,10 +20,18 @@ const (
 )
 
 var (
+	// ErrInvalidSigningMethod means that method used to sign the token doesn't
+	// match the method stated in the token header.
+	ErrInvalidSigningMethod = errors.New("Invalid signing method")
+
+	// ErrInvalidToken means the token isn't valid.
+	ErrInvalidToken = errors.New("Invalid token")
+
 	// Router is the router for our application.
 	Router = NewDefaultMux()
 
-	t = template.Must(template.ParseGlob(templatePath))
+	t          = template.Must(template.ParseGlob(templatePath))
+	signingKey = genRandBytes()
 )
 
 // HomeHandler serves the home page.
@@ -126,4 +138,42 @@ func NewDefaultMux() *httprouter.Router {
 	r.ServeFiles("/assets/*filepath", http.Dir(assetPath))
 
 	return r
+}
+
+func genToken() (string, error) {
+	tok := jwt.New(jwt.SigningMethodHS256)
+
+	tok.Claims["sub"] = "admin"
+	tok.Claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
+	tok.Claims["iat"] = time.Now().Unix()
+
+	return tok.SignedString(signingKey)
+}
+
+func verifyToken(tokStr string) error {
+	tok, err := jwt.Parse(tokStr, func(token *jwt.Token) (interface{}, error) {
+		_, ok := token.Method.(*jwt.SigningMethodHMAC)
+		if !ok {
+			return nil, ErrInvalidSigningMethod
+		}
+		return signingKey, nil
+	})
+	if err != nil {
+		return err
+	}
+
+	if !tok.Valid {
+		return ErrInvalidToken
+	}
+
+	return nil
+}
+
+func genRandBytes() []byte {
+	b := make([]byte, 24)
+	_, err := rand.Read(b)
+	if err != nil {
+		panic(err)
+	}
+	return []byte(base64.URLEncoding.EncodeToString(b))
 }
