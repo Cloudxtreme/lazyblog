@@ -18,7 +18,7 @@ Secret Formula
 
 1. One(1) [httprouter](https://github.com/julienschmidt/httprouter).
 2. Two(2) [BoltDB](https://github.com/boltdb/bolt) buckets.
-3. Cache rendered blog post.
+3. Cache rendered blog posts.
 
 When you submit a completed blog post, that post (along with its template) are rendered to create a complete HTML page. That HTML page is then saved in a BoltDB bucket for that post. Next time someone visits the page that contains that blog post, the HTML is loaded directly from BoltDB, meaning that it doesn't need to be rendered again. This gives you incredibly low latency, and allows the server to handle a huge amount of requests.
 
@@ -38,6 +38,22 @@ Running 10s test @ http://localhost:3000/posts/here-is-me-post-56ce5f87
 Requests/sec:  52393.49
 Transfer/sec:     25.98MB
 ```
+
+**Post JSON**:
+
+```
+λ wrk -d10 -c20 -t10 "http://localhost:3000/api/posts/here-is-me-post-56ce5f87"
+Running 10s test @ http://localhost:3000/api/posts/here-is-me-post-56ce5f87
+  10 threads and 20 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency   448.74us  647.37us  14.53ms   96.56%
+    Req/Sec     5.26k   334.52     6.43k    84.65%
+  528850 requests in 10.10s, 135.17MB read
+Requests/sec:  52353.43
+Transfer/sec:     13.38MB
+```
+
+I think BoltDB might be the bottleneck in two tests above, will investigate one day.
 
 **Homepage (not cached)**:
 
