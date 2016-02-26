@@ -54,6 +54,13 @@ func GetPostHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params
 	}
 }
 
+// APIGetPostHandler returns the post as JSON.
+func APIGetPostHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	w.Header().Set("Content-Type", "application/json")
+	id := ps.ByName("id")
+	w.Write(GetPostForAPI(id))
+}
+
 // NewPostHandler shows the page that allows you to create a new post.
 func NewPostHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	err := t.ExecuteTemplate(w, "new", nil)
@@ -149,6 +156,9 @@ func NewDefaultMux() *httprouter.Router {
 	r.GET("/posts/:id", GetPostHandler)
 	r.GET("/admin/login", LoginHandler)
 	r.POST("/admin/login", LoginPostHandler)
+
+	// API
+	r.GET("/api/posts/:id", APIGetPostHandler)
 
 	// Authenticated routes
 	r.GET("/admin", AuthenticatedRoute(AdminHandler))

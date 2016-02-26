@@ -72,6 +72,18 @@ func GetPost(id string) []byte {
 	return buf
 }
 
+// GetPostForAPI gets the JSON for the post the given id. For use with the
+// API endpoints.
+func GetPostForAPI(id string) []byte {
+	var buf []byte
+	DefaultStore.View(func(tx *bolt.Tx) error {
+		raw := tx.Bucket(_raw)
+		buf = raw.Get([]byte(id))
+		return nil
+	})
+	return buf
+}
+
 // GetAll retrieves every post from the database, in byte order.
 func GetAll() []*PostJSON {
 	var posts []*PostJSON
