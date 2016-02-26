@@ -48,8 +48,8 @@ func NewPostHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params)
 	}
 }
 
-// NewPostSubmit handles the post submission.
-func NewPostSubmit(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+// NewPostSubmitHandler handles the post submission.
+func NewPostSubmitHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	r.ParseForm()
 	title := r.FormValue("title")
 	post := &PostJSON{
@@ -65,9 +65,15 @@ type httprouterHandler func(w http.ResponseWriter, r *http.Request, ps httproute
 
 // AuthenticatedRoute protects the route
 func AuthenticatedRoute(next httprouterHandler) httprouter.Handle {
+	// check if user is authenticated
 	return httprouter.Handle(func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		next(w, r, ps)
 	})
+}
+
+// AdminHandler serves the admin page.
+func AdminHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+
 }
 
 // NewDefaultMux returns the router with its routes already initialized.
@@ -80,7 +86,8 @@ func NewDefaultMux() *httprouter.Router {
 	r.GET("/new", NewPostHandler)
 	r.GET("/posts/:id", GetPostHandler)
 
-	r.POST("/new", NewPostSubmit)
+	r.POST("/new", NewPostSubmitHandler)
+	r.GET("/what", AuthenticatedRoute(GetPostHandler)) // it works y'all
 
 	// Server static files
 	r.ServeFiles("/assets/*filepath", http.Dir(assetPath))
