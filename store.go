@@ -91,6 +91,8 @@ func GetAll() []*PostJSON {
 		raw := tx.Bucket(_raw)
 		c := raw.Cursor()
 
+		// Posts need to be ordered by the trailing base16 string, since it's
+		// actually in descending byte-order
 		for id, postJSON := c.First(); id != nil; id, postJSON = c.Next() {
 			var post *PostJSON
 			json.Unmarshal(postJSON, &post)
@@ -194,4 +196,11 @@ func NewDefaultStore() *bolt.DB {
 	})
 
 	return db
+}
+
+// GetID gets trailing 8 bytes of each post title that represent the ID of each
+// post. Since these bytes are in "order", they're used for ordering the
+// results by date created.
+func GetID(id []byte) []byte {
+	return id[(len(id) - 8):]
 }
