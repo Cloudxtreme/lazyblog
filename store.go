@@ -50,9 +50,9 @@ func SetPost(w http.ResponseWriter, post *PostJSON) {
 	})
 
 	// Ideally this would happen before we touch the buckets, but:
-	//     1. It's good to check for errors
-	//     2. Calling `writeTo` drains the buffer.
-	// So idk what to yet
+	//   1. It's good to check for errors
+	//   2. Calling `writeTo` drains the buffer.
+	// So idk what to do yet
 	_, err = buf.WriteTo(w)
 	if err != nil {
 		log.Println("Error: ", err)
@@ -72,8 +72,7 @@ func GetPost(id string) []byte {
 	return buf
 }
 
-// GetAll retrieves every post from the database. You probably don't want to
-// use this -- use GetPosts instead.
+// GetAll retrieves every post from the database, in byte order.
 func GetAll() []*PostJSON {
 	var posts []*PostJSON
 	DefaultStore.View(func(tx *bolt.Tx) error {

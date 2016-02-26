@@ -79,24 +79,23 @@ type httprouterHandler func(w http.ResponseWriter, r *http.Request, ps httproute
 
 // AuthenticatedRoute protects the route
 func AuthenticatedRoute(next httprouterHandler) httprouter.Handle {
-	// check if user is authenticated
 	return httprouter.Handle(func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+		cookie, err := r.Cookie(cookieName)
+		if err != nil {
+			w.Write([]byte("No cookie" + err.Error()))
+			return
+		}
+		err = verifyToken(cookie.Value)
+		if err != nil {
+			w.Write([]byte("Token is bad" + err.Error()))
+			return
+		}
 		next(w, r, ps)
 	})
 }
 
 // AdminHandler serves the admin page.
 func AdminHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	cookie, err := r.Cookie(cookieName)
-	if err != nil {
-		w.Write([]byte("No cookie" + err.Error()))
-		return
-	}
-	err = verifyToken(cookie.Value)
-	if err != nil {
-		w.Write([]byte("Token is bad" + err.Error()))
-		return
-	}
 	w.Write([]byte("YAY"))
 }
 
@@ -147,15 +146,14 @@ func NewDefaultMux() *httprouter.Router {
 
 	// Routes
 	r.GET("/", HomeHandler)
-	r.GET("/new", NewPostHandler)
 	r.GET("/posts/:id", GetPostHandler)
-	r.GET("/admin", AdminHandler)
 	r.GET("/admin/login", LoginHandler)
-
 	r.POST("/admin/login", LoginPostHandler)
 
 	// Authenticated routes
-	r.POST("/new", NewPostSubmitHandler)
+	r.GET("/admin", AuthenticatedRoute(AdminHandler))
+	r.GET("/new", AuthenticatedRoute(NewPostHandler))
+	r.POST("/new", AuthenticatedRoute(NewPostSubmitHandler))
 
 	// Server static files
 	r.ServeFiles("/assets/*filepath", http.Dir(assetPath))
@@ -179,6 +177,7 @@ func verifyToken(tokStr string) error {
 		if !ok {
 			return nil, ErrInvalidSigningMethod
 		}
+		// @TODO: need to verify expiry date here
 		return signingKey, nil
 	})
 	if err != nil {
