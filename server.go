@@ -32,6 +32,7 @@ var (
 
 	t          = template.Must(template.ParseGlob(templatePath))
 	signingKey = genRandBytes()
+	cookieName = "_lazyblog_token"
 )
 
 // HomeHandler serves the home page.
@@ -86,7 +87,17 @@ func AuthenticatedRoute(next httprouterHandler) httprouter.Handle {
 
 // AdminHandler serves the admin page.
 func AdminHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	// @TODO
+	cookie, err := r.Cookie(cookieName)
+	if err != nil {
+		w.Write([]byte("No cookie" + err.Error()))
+		return
+	}
+	err = verifyToken(cookie.Value)
+	if err != nil {
+		w.Write([]byte("Token is bad" + err.Error()))
+		return
+	}
+	w.Write([]byte("YAY"))
 }
 
 // LoginHandler serves the admin login page.
@@ -114,8 +125,19 @@ func LoginPostHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Param
 		return
 	}
 
-	// Issue the authenticated user a token
-	w.Write([]byte("Good credentials"))
+	tok, err := genToken()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	http.SetCookie(w, &http.Cookie{
+		Name:     cookieName,
+		Value:    tok,
+		Path:     "/",
+		HttpOnly: true,
+		// Secure: true, not yet, set this on once dev complete
+	})
+	http.Redirect(w, r, "/admin", http.StatusFound)
 }
 
 // NewDefaultMux returns the router with its routes already initialized.
@@ -127,6 +149,7 @@ func NewDefaultMux() *httprouter.Router {
 	r.GET("/", HomeHandler)
 	r.GET("/new", NewPostHandler)
 	r.GET("/posts/:id", GetPostHandler)
+	r.GET("/admin", AdminHandler)
 	r.GET("/admin/login", LoginHandler)
 
 	r.POST("/admin/login", LoginPostHandler)
