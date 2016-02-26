@@ -18,6 +18,7 @@ type Post struct {
 // PostJSON is the struct that represents our "raw" data.
 type PostJSON struct {
 	ID          string
+	Path        string
 	Title       string
 	Body        string
 	DateCreated time.Time
@@ -26,6 +27,10 @@ type PostJSON struct {
 // NewID base16 encodes the current time, to be used along with the Urlify'd
 // Post title in order generate a usable ID for each post. BoltDB orders it's
 // data by byte order, so this ID is used to order posts from oldest to newest.
+//
+// On second thought, since we now use this and only this to assign post IDs,
+// it make sens to use a more sophisticated algortihm. I'm considering
+// Twitter's snowflake one.
 func NewID() string {
 	now := big.NewInt(time.Now().Unix()).Bytes()
 	return hex.EncodeToString(now)

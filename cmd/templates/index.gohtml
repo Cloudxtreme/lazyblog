@@ -2,7 +2,7 @@
 <main class="px2">
   <h1>Home page</h1>
   {{ range . }}
-    <h3><a href="/posts/{{ .ID }}">{{ .Title }}</a></h3>
+    <h3><a href="/posts/{{ .Path }}">{{ .Title }}</a></h3>
     <p>{{ .Body }}</p>
   {{ end }}
   <button class="btn"><a href="/new">New Post</a></button>

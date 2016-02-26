@@ -73,8 +73,10 @@ func NewPostHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params)
 func NewPostSubmitHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	r.ParseForm()
 	title := r.FormValue("title")
+	id := NewID()
 	post := &PostJSON{
-		ID:          Urlify(title) + NewID(),
+		ID:          id,
+		Path:        Urlify(title) + id,
 		Title:       title,
 		Body:        r.FormValue("body"),
 		DateCreated: time.Now(),

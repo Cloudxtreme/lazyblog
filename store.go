@@ -65,7 +65,7 @@ func GetPost(id string) []byte {
 	var buf []byte
 	DefaultStore.View(func(tx *bolt.Tx) error {
 		rendered := tx.Bucket(_rendered)
-		buf = rendered.Get([]byte(id))
+		buf = rendered.Get(GetID([]byte(id)))
 		return nil
 	})
 
@@ -202,5 +202,13 @@ func NewDefaultStore() *bolt.DB {
 // post. Since these bytes are in "order", they're used for ordering the
 // results by date created.
 func GetID(id []byte) []byte {
+	// This is my fav line of code in this repo. It looks pretty confusing, but
+	// it's pretty simple once you figure out Go's weird slice operations.
+	// Anyway, this is what's happening:
+	//   1. We know that each ID is the last 8 chars in the ID string, so
+	//   2. We find the index of the first char by subtracting 8 from the
+	//      length of our id.
+	//   3. We return all the bytes from that index to the end of the string.
+	// This generates no garbage and runs at 13 ns/op!
 	return id[(len(id) - 8):]
 }
