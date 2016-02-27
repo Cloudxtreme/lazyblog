@@ -18,7 +18,7 @@ Secret Formula
 
 1. One(1) [httprouter](https://github.com/julienschmidt/httprouter).
 2. Two(2) [BoltDB](https://github.com/boltdb/bolt) buckets.
-3. Cache rendered blog posts.
+3. Cache all rendered blog posts and JSON.
 
 When you submit a completed blog post, that post (along with its template) are rendered to create a complete HTML page. That HTML page is then saved in a BoltDB bucket for that post. Next time someone visits the page that contains that blog post, the HTML is loaded directly from BoltDB, meaning that it doesn't need to be rendered again. This gives you incredibly low latency, and allows the server to handle a huge amount of requests.
 
