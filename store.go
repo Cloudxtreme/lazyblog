@@ -72,6 +72,20 @@ func GetPost(id string) []byte {
 	return buf
 }
 
+// DeletePost deletes a post given its id. It deletes a post from both buckets.
+func DeletePost(id string) error {
+	return DefaultStore.Update(func(tx *bolt.Tx) error {
+		raw := tx.Bucket(_raw)
+		rendered := tx.Bucket(_rendered)
+
+		err := raw.Delete([]byte(id))
+		if err != nil {
+			return err
+		}
+		return rendered.Delete([]byte("id"))
+	})
+}
+
 // GetPostForAPI gets the JSON for the post the given id. For use with the
 // API endpoints.
 func GetPostForAPI(id string) []byte {

@@ -111,6 +111,17 @@ func EditPostSubmitHandler(w http.ResponseWriter, r *http.Request, _ httprouter.
 	SetPost(w, post)
 }
 
+// DeletePostSubmitHandler deletes an existing post.
+func DeletePostSubmitHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	r.ParseForm()
+	err := DeletePost(r.FormValue("id"))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	http.Redirect(w, r, "/admin", http.StatusFound)
+}
+
 type httprouterHandler func(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 
 // AuthenticatedRoute protects the route
@@ -198,6 +209,7 @@ func NewDefaultMux() *httprouter.Router {
 	r.GET("/admin/new", AuthenticatedRoute(NewPostHandler))
 	r.POST("/admin/new", AuthenticatedRoute(NewPostSubmitHandler))
 	r.POST("/admin/edit", AuthenticatedRoute(EditPostSubmitHandler))
+	r.POST("/admin/delete", AuthenticatedRoute(DeletePostSubmitHandler))
 
 	// Server static files
 	r.ServeFiles("/assets/*filepath", http.Dir(assetPath))
