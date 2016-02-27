@@ -78,7 +78,7 @@ func GetPostForAPI(id string) []byte {
 	var buf []byte
 	DefaultStore.View(func(tx *bolt.Tx) error {
 		raw := tx.Bucket(_raw)
-		buf = raw.Get([]byte(id))
+		buf = raw.Get(GetID([]byte(id)))
 		return nil
 	})
 	return buf
