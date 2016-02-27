@@ -1,0 +1,15 @@
+{{ define "edit" }}{{ template "header" . }}
+<main class="px2">
+  <h1>Edit Post</h1>
+  <form action="/admin/edit" method="POST">
+    <input type="text" name="title" placeholder="Title" autofocus="true" required="true" value="{{ .Title }}">
+    <br>
+    <div class="writing">
+      <textarea name="body" placeholder="Body" rows="20">{{ .Body }}</textarea>
+    </div>
+    <input type="hidden" name="id" value="{{ .ID }}">
+    <input type="hidden" name="path" value="{{ .Path }}">
+    <input type="hidden" name="datecreated" value="{{ .DateCreated }}">
+    <input class="btn" type="submit" value="Update">
+  </form>
+</main>{{ template "footer" }}{{ end }}

@@ -3,6 +3,7 @@ package lazyblog
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"encoding/json"
 	"errors"
 	"html/template"
 	"log"
@@ -61,6 +62,19 @@ func APIGetPostHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 	w.Write(GetPostForAPI(id))
 }
 
+// AdminGetPostHandler returns the post as JSON to the admin panel so that post
+// may be edited.
+func AdminGetPostHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	var post PostJSON
+	postJSON := GetPostForAPI(ps.ByName("id"))
+	err := json.Unmarshal(postJSON, &post)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+	t.ExecuteTemplate(w, "edit", post)
+}
+
 // NewPostHandler shows the page that allows you to create a new post.
 func NewPostHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	err := t.ExecuteTemplate(w, "new", nil)
@@ -80,6 +94,19 @@ func NewPostSubmitHandler(w http.ResponseWriter, r *http.Request, _ httprouter.P
 		Title:       title,
 		Body:        r.FormValue("body"),
 		DateCreated: time.Now(),
+	}
+	SetPost(w, post)
+}
+
+// EditPostSubmitHandler handles editing existing posts.
+func EditPostSubmitHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	r.ParseForm()
+	post := &PostJSON{
+		ID:          r.FormValue("id"),
+		Path:        r.FormValue("path"),
+		Title:       r.FormValue("title"),
+		Body:        r.FormValue("body"),
+		DateCreated: time.Now(), // should be switched to lastUpdated
 	}
 	SetPost(w, post)
 }
@@ -105,7 +132,10 @@ func AuthenticatedRoute(next httprouterHandler) httprouter.Handle {
 
 // AdminHandler serves the admin page.
 func AdminHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	w.Write([]byte("YAY"))
+	err := t.ExecuteTemplate(w, "admin", GetAll())
+	if err != nil {
+		log.Printf("Error rendering login template: ", err.Error())
+	}
 }
 
 // LoginHandler serves the admin login page.
@@ -157,6 +187,7 @@ func NewDefaultMux() *httprouter.Router {
 	r.GET("/", HomeHandler)
 	r.GET("/posts/:id", GetPostHandler)
 	r.GET("/admin/login", LoginHandler)
+	r.GET("/admin/posts/:id", AdminGetPostHandler)
 	r.POST("/admin/login", LoginPostHandler)
 
 	// API
@@ -164,8 +195,9 @@ func NewDefaultMux() *httprouter.Router {
 
 	// Authenticated routes
 	r.GET("/admin", AuthenticatedRoute(AdminHandler))
-	r.GET("/new", AuthenticatedRoute(NewPostHandler))
-	r.POST("/new", AuthenticatedRoute(NewPostSubmitHandler))
+	r.GET("/admin/new", AuthenticatedRoute(NewPostHandler))
+	r.POST("/admin/new", AuthenticatedRoute(NewPostSubmitHandler))
+	r.POST("/admin/edit", AuthenticatedRoute(EditPostSubmitHandler))
 
 	// Server static files
 	r.ServeFiles("/assets/*filepath", http.Dir(assetPath))

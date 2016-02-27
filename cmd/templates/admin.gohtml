@@ -1,0 +1,8 @@
+{{ define "admin" }}{{ template "header" . }}
+<main class="px2">
+  <h1>Admin</h1>
+  {{ range . }}
+    <h3><a href="/admin/posts/{{ .Path }}">Edit {{ .Title }}</a></h3>
+  {{ end }}
+  <button class="btn"><a href="/admin/new">New Post</a></button>
+</main>{{ template "footer" }}{{ end }}
