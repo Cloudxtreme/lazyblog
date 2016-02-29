@@ -107,7 +107,7 @@ func GetAll() []*PostJSON {
 
 		// Posts need to be ordered by the trailing base16 string, since it's
 		// actually in descending byte-order
-		for id, postJSON := c.First(); id != nil; id, postJSON = c.Next() {
+		for id, postJSON := c.Last(); id != nil; id, postJSON = c.Prev() {
 			var post *PostJSON
 			json.Unmarshal(postJSON, &post)
 			posts = append(posts, post)
