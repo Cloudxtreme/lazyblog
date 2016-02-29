@@ -124,17 +124,24 @@ func DeletePostSubmitHandler(w http.ResponseWriter, r *http.Request, _ httproute
 
 type httprouterHandler func(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 
-// AuthenticatedRoute protects the route
+// AuthenticatedRoute protects the route.
 func AuthenticatedRoute(next httprouterHandler) httprouter.Handle {
 	return httprouter.Handle(func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		cookie, err := r.Cookie(cookieName)
 		if err != nil {
-			w.Write([]byte("No cookie" + err.Error()))
+			// If there isn't a cookie, send the user to the sign in page. We
+			// should probably tell the user that they must be signed in to
+			// view anything under /admin.
+			http.Redirect(w, r, "/admin/login", http.StatusFound)
 			return
 		}
 		err = verifyToken(cookie.Value)
 		if err != nil {
-			w.Write([]byte("Token is bad" + err.Error()))
+			// If the token can't be verified, then redirect them to the sign
+			// in page. In the future, we should show a message that informs
+			// the user that tokens are invalidated between server restarts,
+			// since that's what typically causes the error.
+			http.Redirect(w, r, "/admin/login", http.StatusFound)
 			return
 		}
 		next(w, r, ps)

@@ -1,5 +1,6 @@
 {{ define "edit" }}{{ template "header" . }}
 <main class="px2">
+  <a href="/admin">Admin Home</a>
   <h1>Edit Post</h1>
   <form action="/admin/edit" method="POST">
     <input type="text" name="title" placeholder="Title" autofocus="true" required="true" value="{{ .Title }}">
