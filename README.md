@@ -1,4 +1,4 @@
-Lazyblog
+Lazyblog [![Build Status](https://semaphoreci.com/api/v1/bentranter/lazyblog/branches/master/badge.svg)](https://semaphoreci.com/bentranter/lazyblog)
 ---
 
 Lazyblog is viral-proof blogging platform.
