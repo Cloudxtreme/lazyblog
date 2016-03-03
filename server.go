@@ -8,16 +8,12 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/julienschmidt/httprouter"
 	"golang.org/x/crypto/bcrypt"
-)
-
-const (
-	templatePath = "/Users/bentranter/Go/src/github.com/bentranter/lazyblog/cmd/templates/*"
-	assetPath    = "/Users/bentranter/Go/src/github.com/bentranter/lazyblog/cmd/assets"
 )
 
 var (
@@ -31,9 +27,10 @@ var (
 	// Router is the router for our application.
 	Router = NewDefaultMux()
 
-	t          = template.Must(template.ParseGlob(templatePath))
-	signingKey = genRandBytes()
-	cookieName = "_lazyblog_token"
+	templatePath = os.Getenv("GOPATH") + "/src/github.com/bentranter/lazyblog/cmd/templates/*"
+	t            = template.Must(template.ParseGlob(templatePath))
+	signingKey   = genRandBytes()
+	cookieName   = "_lazyblog_token"
 )
 
 // HomeHandler serves the home page.
