@@ -219,9 +219,14 @@ func NewDefaultMux() *httprouter.Router {
 	r.POST("/admin/delete", AuthenticatedRoute(DeletePostSubmitHandler))
 
 	// Server static files
-	r.ServeFiles("/assets/*filepath", http.Dir(assetPath))
+	r.GET("/assets/css/main.css", serveCSS)
 
 	return r
+}
+
+func serveCSS(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	w.Header().Set("Content-Type", "text/css")
+	w.Write(css)
 }
 
 func genToken() (string, error) {

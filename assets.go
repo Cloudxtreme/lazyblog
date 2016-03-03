@@ -1,3 +1,7 @@
+package lazyblog
+
+var (
+	css = []byte(`
 html, body {
   font-family: 'Inconsolata', Menlo, monospace;
   margin: 0;
@@ -64,3 +68,5 @@ textarea {
 .btn:visited { color: #fff }
 
 .px2 { padding-left: 1rem; padding-right: 1rem }
+		`)
+)
