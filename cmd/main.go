@@ -2,7 +2,9 @@ package main
 
 import (
 	"flag"
+	"log"
 	"net/http"
+	"os"
 
 	"github.com/bentranter/lazyblog"
 )
@@ -14,5 +16,9 @@ func main() {
 	lazyblog.Setup(*username, *password)
 
 	defer lazyblog.DefaultStore.Close()
-	http.ListenAndServe(":3000", lazyblog.Router)
+
+	if os.Getenv("LAZYBLOG_ENV") == "dev" {
+		log.Fatalln(http.ListenAndServe(":3000", lazyblog.Router))
+	}
+	log.Fatalln(http.ListenAndServe(":80", lazyblog.Router))
 }
