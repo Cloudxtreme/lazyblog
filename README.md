@@ -13,6 +13,13 @@ Your site crashes!
 
 But it doesn't have to be that way. With Lazyblog, your site is viral-proof! Using our secret formula, we've created a way for your blog posts to withstand incredible load. Just check out the bechmarks at the bottom of this doc!
 
+Usage
+---
+
+Setting up a new "Lazyblog" is (almost) very simple. Just clone and compile the repo, and run `lazyblog -username="<your-username>" -password="<your-password>` to setup your site, then login with those same credentials at `/admin/login`. If you want to use this in development mode, you'll need to set the environment variable `LAZYBLOG_ENV=dev`, otherwise it will default to running on port 80.
+
+In the future, I _promise_ I'll make this much easier.
+
 Secret Formula
 ---
 
