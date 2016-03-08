@@ -212,6 +212,20 @@ func NewDefaultStore() *bolt.DB {
 	return db
 }
 
+// NumUsers returns how many users are registered.
+func NumUsers() (int, error) {
+	var numUsers int
+	err := DefaultStore.View(func(tx *bolt.Tx) error {
+		users := tx.Bucket(_users)
+		numUsers = users.Stats().KeyN
+		return nil
+	})
+	if err != nil {
+		return 0, err
+	}
+	return numUsers, nil
+}
+
 // GetID gets trailing 8 bytes of each post title that represent the ID of each
 // post. Since these bytes are in "order", they're used for ordering the
 // results by date created.
