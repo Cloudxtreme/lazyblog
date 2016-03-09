@@ -14,12 +14,14 @@ func Setup() {
 	var username []byte
 	var password []byte
 
-	fmt.Printf("Enter a username:\n")
-	fmt.Scanf("%s", &username)
-	fmt.Printf("Enter a password:\n")
-	fmt.Scanf("%s", &password)
-
-	log.Printf("%s %s\n", username, password)
+	for username == nil {
+		fmt.Printf("Enter a username:\n")
+		fmt.Scanf("%s", &username)
+	}
+	for password == nil {
+		fmt.Printf("Enter a password:\n")
+		fmt.Scanf("%s", &password)
+	}
 
 	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
