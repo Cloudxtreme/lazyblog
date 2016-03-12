@@ -20,6 +20,24 @@ Setting up a new "Lazyblog" is (almost) very simple. Just clone and compile the 
 
 In the future, I _promise_ I'll make this much easier.
 
+Kind-Of Lazy Deployment
+---
+
+With Supervisor installed, you can use the file,
+
+```conf
+[program:lazyblog]
+command=/root/go/src/github.com/bentranter/lazyblog/cmd/cmd -username="<your-username>" -password="<your-password>"
+autostart=true
+autorestart=true
+startretries=10
+user=<your-user>
+redirect_stderr=true
+stdout_logfile=/var/log/supervisor/lazyblog.log
+stdout_logfile_maxbytes=50MB
+stdout_logfile_backups=10
+```
+
 Secret Formula
 ---
 
