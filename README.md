@@ -78,7 +78,7 @@ Requests/sec:  52353.43
 Transfer/sec:     13.38MB
 ```
 
-I think BoltDB might be the bottleneck in two tests above, will investigate one day.
+I've tested this, and I think I've made a discovery: BoltDB itself is not the bottleneck - the bottleneck is the HTTP package! That means that your content literally cannot be served any faster using the normal HTTP package. Pretty cool to think that your content _feels_ dynamic, but is served as fast as `net/http` can serve some "Hello, World" bytes.
 
 **Homepage (not cached)**:
 
