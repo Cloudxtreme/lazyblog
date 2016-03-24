@@ -7,7 +7,7 @@ html, body {
   margin: 0;
   color: rgba(0,0,0,.8);
   font-size: 1.0625rem;
-  line-height: 1.7542;
+  line-height: 1.75;
 }
 
 h1 {
@@ -62,11 +62,20 @@ textarea {
   margin-bottom: 2.5rem;
 }
 
-.btn > a { color: #fff; text-decoration: none }
+.btn > a {
+  color: #fff; text-decoration: none;
+}
 
-.btn:hover { cursor: pointer }
-.btn:visited { color: #fff }
+.btn:hover {
+  cursor: pointer;
+}
 
-.px2 { padding-left: 1rem; padding-right: 1rem }
+.btn:visited {
+  color: #fff;
+}
+
+.px2 {
+  padding-left: 1rem; padding-right: 1rem;
+}
 		`)
 )
