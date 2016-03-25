@@ -24,6 +24,9 @@ var (
 	// ErrInvalidToken means the token isn't valid.
 	ErrInvalidToken = errors.New("Invalid token")
 
+	// ErrExpiredToken means that token has expired.
+	ErrExpiredToken = errors.New("Expired token")
+
 	// Router is the router for our application.
 	Router = NewDefaultMux()
 
@@ -242,7 +245,6 @@ func verifyToken(tokStr string) error {
 		if !ok {
 			return nil, ErrInvalidSigningMethod
 		}
-		// @TODO: need to verify expiry date here
 		return signingKey, nil
 	})
 	if err != nil {
@@ -251,6 +253,10 @@ func verifyToken(tokStr string) error {
 
 	if !tok.Valid {
 		return ErrInvalidToken
+	}
+
+	if tok.Claims["exp"].(int64) < time.Now().Unix() {
+		return ErrExpiredToken
 	}
 
 	return nil
