@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -8,27 +9,47 @@ import (
 	"github.com/bentranter/lazyblog"
 )
 
-func main() {
-	switch os.Args[1] {
-	case "setup":
-		defer lazyblog.DefaultStore.Close()
-		lazyblog.Setup()
-	case "start":
-		defer lazyblog.DefaultStore.Close()
-		numUsers, err := lazyblog.NumUsers()
-		if err != nil {
-			panic(err)
-		}
-		if numUsers < 1 {
-			log.Fatalln("Please run setup before running start")
-			return
-		}
+const usage = `
+NAME:
+   lazyblog - viral-proof personal blogging platform
 
-		if os.Getenv("LAZYBLOG_ENV") == "dev" {
-			log.Fatalln(http.ListenAndServe(":3000", lazyblog.Router))
+USAGE:
+   lazyblog <command>
+
+VERSION:
+   0.1.0
+
+COMMANDS:
+   setup    Create a new login and password combination
+   start    Start the server
+
+`
+
+func main() {
+	if len(os.Args) > 1 {
+		switch os.Args[1] {
+		case "setup":
+			defer lazyblog.DefaultStore.Close()
+			lazyblog.Setup()
+		case "start":
+			defer lazyblog.DefaultStore.Close()
+			numUsers, err := lazyblog.NumUsers()
+			if err != nil {
+				panic(err)
+			}
+			if numUsers < 1 {
+				log.Fatalln("Please run setup before running start")
+				return
+			}
+
+			if os.Getenv("LAZYBLOG_ENV") == "dev" {
+				log.Fatalln(http.ListenAndServe(":3000", lazyblog.Router))
+			}
+			log.Fatalln(http.ListenAndServe(":80", lazyblog.Router))
+		default:
+			fmt.Println(usage)
 		}
-		log.Fatalln(http.ListenAndServe(":80", lazyblog.Router))
-	default:
-		log.Fatalln("Please choose either setup or serve")
+	} else {
+		fmt.Println(usage)
 	}
 }

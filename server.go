@@ -178,20 +178,28 @@ func LoginPostHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Param
 	if err != nil {
 		// @TODO: should redirect with flash message for v0.1.0
 		http.Redirect(w, r, "/admin/login", http.StatusFound)
+		log.Printf("Error logging in: %s\n", err.Error())
 		return
 	}
 
 	tok, err := genToken()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Printf("Error generating token: %s\n", err.Error())
 		return
 	}
+
+	isSecure := false
+	if r.URL.Scheme == "https" {
+		isSecure = true
+	}
+
 	http.SetCookie(w, &http.Cookie{
 		Name:     cookieName,
 		Value:    tok,
 		Path:     "/",
 		HttpOnly: true,
-		// Secure: true, not yet, set this on once dev complete
+		Secure:   isSecure,
 	})
 	http.Redirect(w, r, "/admin", http.StatusFound)
 }
@@ -255,7 +263,7 @@ func verifyToken(tokStr string) error {
 		return ErrInvalidToken
 	}
 
-	if tok.Claims["exp"].(int64) < time.Now().Unix() {
+	if int64(tok.Claims["exp"].(float64)) < time.Now().Unix() {
 		return ErrExpiredToken
 	}
 
