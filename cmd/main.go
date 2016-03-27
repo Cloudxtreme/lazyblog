@@ -11,7 +11,7 @@ import (
 
 const usage = `
 NAME:
-   lazyblog - viral-proof personal blogging platform
+   lazyblog - viral proof personal blogging platform
 
 USAGE:
    lazyblog <command>
@@ -22,6 +22,7 @@ VERSION:
 COMMANDS:
    setup    Create a new login and password combination
    start    Start the server
+   help     Show this help information
 
 `
 
