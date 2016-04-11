@@ -30,7 +30,8 @@ var (
 	// Router is the router for our application.
 	Router = NewDefaultMux()
 
-	templatePath = os.Getenv("GOPATH") + "/src/github.com/bentranter/lazyblog/cmd/templates/*"
+	templatePath = os.Getenv("GOPATH") + "/src/github.com/bentranter/lazyblog/cmd/layout/*"
+	assetPath    = os.Getenv("GOPATH") + "/src/github.com/bentranter/lazyblog/cmd/static/*"
 	t            = template.Must(template.ParseGlob(templatePath))
 	signingKey   = genRandBytes()
 	cookieName   = "_lazyblog_token"
@@ -226,15 +227,10 @@ func NewDefaultMux() *httprouter.Router {
 	r.POST("/admin/edit", AuthenticatedRoute(EditPostSubmitHandler))
 	r.POST("/admin/delete", AuthenticatedRoute(DeletePostSubmitHandler))
 
-	// Server static files
-	r.GET("/assets/css/main.css", serveCSS)
+	// Serve static assets
+	r.ServeFiles("/static/*filepath", http.Dir(assetPath))
 
 	return r
-}
-
-func serveCSS(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	w.Header().Set("Content-Type", "text/css")
-	w.Write(css)
 }
 
 func genToken() (string, error) {
