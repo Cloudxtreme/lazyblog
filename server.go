@@ -31,7 +31,7 @@ var (
 	Router = NewDefaultMux()
 
 	templatePath = os.Getenv("GOPATH") + "/src/github.com/bentranter/lazyblog/cmd/layout/*"
-	assetPath    = os.Getenv("GOPATH") + "/src/github.com/bentranter/lazyblog/cmd/static/*"
+	assetPath    = os.Getenv("GOPATH") + "/src/github.com/bentranter/lazyblog/cmd/static"
 	t            = template.Must(template.ParseGlob(templatePath))
 	signingKey   = genRandBytes()
 	cookieName   = "_lazyblog_token"
