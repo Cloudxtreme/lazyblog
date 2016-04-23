@@ -27,7 +27,7 @@ With Supervisor installed, you can use the file,
 
 ```conf
 [program:lazyblog]
-command=/root/go/src/github.com/bentranter/lazyblog/cmd/cmd -username="<your-username>" -password="<your-password>"
+command=/root/go/src/github.com/<your-fork>/lazyblog/cmd/cmd -username="<your-username>" -password="<your-password>"
 autostart=true
 autorestart=true
 startretries=10
