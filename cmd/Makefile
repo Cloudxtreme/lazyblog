@@ -1,9 +1,11 @@
 release:
-	mkdir mac linux
+	mkdir mac linux windows
 	go build -v -o lazyblog
 	mv lazyblog mac/lazyblog
 	env GOOS=linux GOARCH=arm GOARM=7 go build -v -o lazyblog
 	mv lazyblog linux/lazyblog
+	env GOOS=windows GOARCH=386 go build -v -o lazyblog
+	mv lazyblog windows/lazyblog
 
 clean:
 	rm -rf mac linux
