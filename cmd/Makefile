@@ -1,6 +1,6 @@
 release:
 	mkdir mac linux windows
-	go build -v -o lazyblog
+	env GOOS=darwin GOARCH=amd64 go build -v -o lazyblog
 	mv lazyblog mac/lazyblog
 	env GOOS=linux GOARCH=arm GOARM=7 go build -v -o lazyblog
 	mv lazyblog linux/lazyblog
