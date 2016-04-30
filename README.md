@@ -93,3 +93,5 @@ Running 10s test @ http://localhost:3000/
 Requests/sec:  14458.39
 Transfer/sec:     16.96MB
 ```
+
+Available on all platforms. Run `make release` to build for every platform.  
