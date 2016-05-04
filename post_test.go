@@ -12,14 +12,14 @@ func BenchmarkNewID(b *testing.B) {
 }
 
 func TestUrlify(t *testing.T) {
-	str := Urlify("mytest$1234+===((()")
-	str2 := Urlify("my test with spaces")
+	strA := Urlify("mytest$1234+===((()")
+	strB := Urlify("my test with spaces")
 
-	if !strings.Contains(string(str), "mytest1234") {
-		t.Errorf("Didn't pass, got %s, expected mytest1234\n", str)
+	if !strings.Contains(string(strA), "mytest1234") {
+		t.Errorf("Didn't pass, got %s, expected mytest1234\n", strA)
 	}
-	if !strings.Contains(string(str2), "my-test-with-spaces") {
-		t.Errorf("Didn't pass, got %s, expected my-test-with-spaces\n", str2)
+	if !strings.Contains(string(strB), "my-test-with-spaces") {
+		t.Errorf("Didn't pass, got %s, expected my-test-with-spaces\n", strB)
 	}
 }
 

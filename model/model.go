@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/bentranter/lazyblog/util"
-	// "github.com/boltdb/bolt"
 )
 
 // Post is the struct that represents each post.
@@ -29,4 +28,8 @@ func NewPost() *Post {
 		ID:          util.NewID(),
 		DateCreated: time.Now(),
 	}
+}
+
+func (p *Post) Save(s Store) (string, error) {
+	return s.Create(p)
 }
