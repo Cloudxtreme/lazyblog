@@ -15,12 +15,6 @@ type Post struct {
 	DateCreated time.Time
 }
 
-// PostCached is the struct that holds a rendered version of a post.
-type PostCached struct {
-	ID   string
-	Body []byte
-}
-
 // NewPost returns a new post. It should be noted that `SavePost` must be
 // called to save the post to the DB.
 func NewPost() *Post {
@@ -30,6 +24,7 @@ func NewPost() *Post {
 	}
 }
 
-func (p *Post) Save(s Store) (string, error) {
-	return s.Create(p)
+// Set persists a post to the chosen database.
+func (p *Post) Set(s Store) (string, error) {
+	return s.Set(p)
 }
