@@ -18,6 +18,7 @@ var (
 // between our models and any database.
 type Store interface {
 	Set(p *Post) (string, error)
+	Get(id string) (*Post, error)
 }
 
 // Bolt is a store satisfying the `Store` interface. It's used for communicating
@@ -68,15 +69,32 @@ func NewBolt(name string) *Bolt {
 // errors that occurred.
 func (b *Bolt) Set(p *Post) (string, error) {
 	err := b.db.Update(func(tx *bolt.Tx) error {
-		// rawBucket := tx.Bucket(boltRaw)
-		cachedBucket := tx.Bucket(boltCached)
+		rawBucket := tx.Bucket(boltRaw)
+		// cachedBucket := tx.Bucket(boltCached)
 
 		post, err := json.Marshal(p)
 		if err != nil {
 			return err
 		}
 
-		return cachedBucket.Put([]byte(p.ID), post)
+		return rawBucket.Put([]byte(p.ID), post)
 	})
 	return p.ID, err
+}
+
+// Get retrieves a post and marshals it into a struct.
+func (b *Bolt) Get(id string) (*Post, error) {
+	var p *Post
+	err := b.db.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket(boltRaw)
+		err := json.Unmarshal(bucket.Get([]byte(id)), &p)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return p, nil
 }

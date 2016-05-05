@@ -28,3 +28,10 @@ func NewPost() *Post {
 func (p *Post) Set(s Store) (string, error) {
 	return s.Set(p)
 }
+
+// Get retrieves a post from the chosen database, and returns the `Post` struct
+// for it.
+func Get(id string, s Store) (*Post, error) {
+	p, err := s.Get(id)
+	return p, err
+}

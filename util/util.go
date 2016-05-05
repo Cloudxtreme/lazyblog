@@ -1,6 +1,7 @@
 package util
 
 import (
+	"crypto/rand"
 	"encoding/hex"
 	"math/big"
 	"strings"
@@ -31,4 +32,11 @@ func Urlify(id string) string {
 	}
 	bytebuf = append(bytebuf, '-')
 	return string(bytebuf)
+}
+
+// RandStr returns a random string. Used for generating test database names.
+func RandStr() string {
+	b := make([]byte, 6)
+	rand.Read(b)
+	return hex.EncodeToString(b)
 }
