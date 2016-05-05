@@ -12,7 +12,7 @@ type Post struct {
 	Path        string
 	Title       string
 	Body        string
-	DateCreated time.Time
+	DateCreated int64
 }
 
 // NewPost returns a new post. It should be noted that `SavePost` must be
@@ -20,7 +20,7 @@ type Post struct {
 func NewPost() *Post {
 	return &Post{
 		ID:          util.NewID(),
-		DateCreated: time.Now(),
+		DateCreated: time.Now().Unix(),
 	}
 }
 

@@ -13,8 +13,8 @@ func TestNewPost(t *testing.T) {
 	t.Parallel()
 	p := NewPost()
 
-	if p.DateCreated.After(time.Now()) {
-		t.Errorf("DateCreated must be before %s, , but is %s\n", time.Now().String(), p.DateCreated.String())
+	if p.DateCreated > time.Now().Unix() {
+		t.Errorf("DateCreated must be before %d, but is %d\n", time.Now().Unix(), p.DateCreated)
 	}
 }
 
@@ -47,7 +47,7 @@ func TestGet(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error while getting post: %s\n", err.Error())
 	}
-	if !reflect.DeepEqual(p.DateCreated, px.DateCreated) {
+	if !reflect.DeepEqual(p, px) {
 		t.Errorf("Posts do not match: %s %s\n", p.DateCreated, px.DateCreated)
 	}
 
