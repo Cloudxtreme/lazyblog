@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"os"
 	"reflect"
 	"testing"
@@ -8,6 +9,13 @@ import (
 
 	"github.com/bentranter/lazyblog/util"
 )
+
+func ExampleNewPost() {
+	p := NewPost()
+	p.Title = "Hello, world!"
+	fmt.Println(p.Title)
+	// Output: Hello, world!
+}
 
 func TestNewPost(t *testing.T) {
 	t.Parallel()
