@@ -46,8 +46,8 @@ func TestGet(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error while getting post: %s\n", err.Error())
 	}
-	if p.ID != px.ID {
-		t.Errorf("Posts do not match: %s %s\n", p.ID, px.ID)
+	if p.DateCreated != px.DateCreated {
+		t.Errorf("Posts do not match: %s %s\n", p.DateCreated, px.DateCreated)
 	}
 
 	if err = os.Remove(dbStr); err != nil {
