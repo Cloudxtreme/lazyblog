@@ -2,7 +2,6 @@ package model
 
 import (
 	"os"
-	"reflect"
 	"testing"
 	"time"
 
@@ -47,7 +46,7 @@ func TestGet(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error while getting post: %s\n", err.Error())
 	}
-	if !reflect.DeepEqual(p, px) {
+	if p.ID != px.ID || p.DateCreated != px.DateCreated {
 		t.Errorf("Posts do not match: %v %v\n", p, px)
 	}
 
