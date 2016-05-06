@@ -24,7 +24,7 @@ func TestBolt_Set(t *testing.T) {
 	t.Parallel()
 	dbStr := util.RandStr() + ".db"
 	b := NewBolt(dbStr)
-	p := NewPost()
+	p := NewPost("Title", "Body")
 	_, err := b.Set(p)
 
 	if err != nil {
@@ -41,7 +41,7 @@ func TestBolt_Get(t *testing.T) {
 	t.Parallel()
 	dbStr := util.RandStr() + ".db"
 	b := NewBolt(dbStr)
-	p := NewPost()
+	p := NewPost("Title", "Body")
 	id, _ := b.Set(p)
 	px, err := b.Get(id)
 
