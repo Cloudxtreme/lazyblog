@@ -17,7 +17,12 @@ func SetPost(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		Body  string
 	}{}
 	d := json.NewDecoder(r.Body)
-	d.Decode(&v)
+	err := d.Decode(&v)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer r.Body.Close()
 
 	p := model.NewPost(v.Title, v.Body)
 	id, err := p.Set(s)
