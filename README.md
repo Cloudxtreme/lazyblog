@@ -1,7 +1,7 @@
 Lazyblog [![Build Status](https://semaphoreci.com/api/v1/bentranter/lazyblog/branches/master/shields_badge.svg)](https://semaphoreci.com/bentranter/lazyblog)
 ---
 
-Lazyblog is viral-proof blogging platform.
+Lazyblog is viral-proof blogging platform. It also being refactored, and is probably extremely unusable it's current state.
 
 *A what?*
 
@@ -94,4 +94,4 @@ Requests/sec:  14458.39
 Transfer/sec:     16.96MB
 ```
 
-Available on all platforms. Run `make release` to build for every platform.  
+Available on all platforms. Run `make release` to build for every platform.
