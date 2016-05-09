@@ -1,9 +1,9 @@
 Lazyblog [![Build Status](https://semaphoreci.com/api/v1/bentranter/lazyblog/branches/master/shields_badge.svg)](https://semaphoreci.com/bentranter/lazyblog)
 ---
 
-Lazyblog is viral-proof blogging platform. It also being refactored, and is probably extremely unusable it's current state.
+Lazyblog: The Viral-Proof Blogging Platform
 
-*A what?*
+*The what?*
 
 Chances are, when you start a blog for this first time, you're going to opt for the cheapest hosting possible, and easiest setup. This will lead you to shared hosting and Wordpress -- nothing wrong with doing that!
 
@@ -12,6 +12,15 @@ However, let's say you write a blog post, and someone with a lot of Twitter foll
 Your site crashes!
 
 But it doesn't have to be that way. With Lazyblog, your site is viral-proof! Using our secret formula, we've created a way for your blog posts to withstand incredible load. Just check out the bechmarks at the bottom of this doc!
+
+Notice
+---
+
+There are two versions of this: the crappy old one (that worked but the code is hard to read) and the new, beautiful one.
+
+To run the old, working code, navigate to the `cmd` directory and use either `go run` or `go build`.
+
+If you want to try the new stuff, use the same commands in the top level of this repo. It'll use the `main.go` file there.
 
 Usage
 ---
