@@ -22,3 +22,9 @@ func TestRandStr(t *testing.T) {
 		t.Errorf("Random strings should not be equal: %s and %s\n", strA, strB)
 	}
 }
+
+func BenchmarkNewID(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		_ = NewID()
+	}
+}
