@@ -9,6 +9,7 @@ import (
 
 func main() {
 	r := httprouter.New()
+	r.GET("/api", handler.Info)
 	r.GET("/api/post/:id", handler.GetPost)
 	r.POST("/api/post", handler.SetPost)
 

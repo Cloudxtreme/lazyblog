@@ -10,6 +10,20 @@ import (
 
 var s = model.NewBolt("prod.db")
 
+// Info displays info about the available API routes
+func Info(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	routes := map[string]string{
+		"posts_url": "/api/post/:id",
+	}
+	resp, err := json.MarshalIndent(routes, "", "  ")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(resp)
+}
+
 // SetPost is the API method for creating a new post.
 func SetPost(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	v := struct {
