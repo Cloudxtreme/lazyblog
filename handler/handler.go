@@ -30,6 +30,7 @@ func SetPost(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte(id))
 }
 
@@ -47,5 +48,6 @@ func GetPost(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	w.Header().Set("Content-Type", "application/json")
 	w.Write(resp)
 }
