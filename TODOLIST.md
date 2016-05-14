@@ -6,3 +6,4 @@
 3. Add cross-platform compile + release to CI
 4. GH Pages Site + Docs
 5. Stress-test again
+6. Auto-increment IDs because Go is too fast sometimes
