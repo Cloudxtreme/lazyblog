@@ -4,6 +4,7 @@ package model
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/boltdb/bolt"
@@ -19,6 +20,7 @@ var (
 type Store interface {
 	Set(p *Post) (string, error)
 	Get(id string) (*Post, error)
+	GetAll() ([]*Post, error)
 }
 
 // Bolt is a store satisfying the `Store` interface. It's used for communicating
@@ -97,4 +99,28 @@ func (b *Bolt) Get(id string) (*Post, error) {
 		return nil, err
 	}
 	return p, nil
+}
+
+// GetAll returns evert post in the database, and returns them as an array of
+// `Post` structs.
+func (b *Bolt) GetAll() ([]*Post, error) {
+	var posts []*Post
+	err := b.db.View(func(tx *bolt.Tx) error {
+		raw := tx.Bucket(boltRaw)
+		c := raw.Cursor()
+
+		// Posts need to be ordered by the trailing base16 string, since it's
+		// actually in descending byte-order
+		for id, postJSON := c.Last(); id != nil; id, postJSON = c.Prev() {
+			var post *Post
+			json.Unmarshal(postJSON, &post)
+			fmt.Printf("%d %s\n", id, postJSON)
+			posts = append(posts, post)
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return posts, nil
 }

@@ -63,6 +63,29 @@ func TestGet(t *testing.T) {
 	}
 }
 
+func TestGetAll(t *testing.T) {
+	t.Skip()
+	t.Parallel()
+	dbStr := util.RandStr() + ".db"
+	s := NewBolt(dbStr)
+	px := NewPost("Title", "Body")
+	px.Set(s)
+	py := NewPost("Title2", "Body2")
+	py.Set(s)
+	posts, err := GetAll(s)
+
+	if err != nil {
+		t.Errorf("Error while getting post: %s\n", err.Error())
+	}
+	if len(posts) != 2 {
+		t.Errorf("Did not get all posts, expected %d, got %d\n", 2, len(posts))
+	}
+
+	if err = os.Remove(dbStr); err != nil {
+		t.Logf("Info: Error removing test database: %s\n", err.Error())
+	}
+}
+
 func TestPost_urlify(t *testing.T) {
 	t.Parallel()
 	px := &Post{

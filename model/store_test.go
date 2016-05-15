@@ -56,3 +56,28 @@ func TestBolt_Get(t *testing.T) {
 		t.Logf("Info: Error while removing test database: %s\n", err.Error())
 	}
 }
+
+func TestBolt_GetAll(t *testing.T) {
+	t.Skip()
+	t.Parallel()
+	dbStr := util.RandStr() + ".db"
+	b := NewBolt(dbStr)
+	px := NewPost("TitleX", "BodyX")
+	b.Set(px)
+	py := NewPost("TitleY", "BodyY")
+	b.Set(py)
+	posts, err := b.GetAll()
+
+	t.Logf("%s\n", posts)
+
+	if err != nil {
+		t.Errorf("Error while retrieving all posts: %s\n", err.Error())
+	}
+	if len(posts) != 2 {
+		t.Errorf("Didn't get all posts, expected %d, got %d\n", 2, len(posts))
+	}
+
+	if err = os.Remove(dbStr); err != nil {
+		t.Logf("Info: Error while removing test database: %s\n", err.Error())
+	}
+}

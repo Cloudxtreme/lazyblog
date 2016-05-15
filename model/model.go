@@ -49,6 +49,13 @@ func Get(id string, s Store) (*Post, error) {
 	return p, err
 }
 
+// GetAll retrieves every post from the chosen database, and returns every
+// `Post` struct in there.
+func GetAll(s Store) ([]*Post, error) {
+	posts, err := s.GetAll()
+	return posts, err
+}
+
 // urlify is a utility for making strings URL safe. It removes anything that
 // isn't a number or letter, and replaces each with a `-`. It then appends a
 // single "-" to the end, followed by the post ID.
