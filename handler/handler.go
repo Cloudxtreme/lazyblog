@@ -2,66 +2,68 @@ package handler
 
 import (
 	"encoding/json"
-	"net/http"
 
 	"github.com/bentranter/lazyblog/model"
-	"github.com/julienschmidt/httprouter"
+	"github.com/buaazp/fasthttprouter"
+	"github.com/valyala/fasthttp"
 )
 
 var s = model.NewBolt("prod.db")
 
-// Info displays info about the available API routes
-func Info(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+// Info displays info about the available API routes.
+//
+// @TODO: Don't marshal JSON for every request, just hard code this as a byte
+//        slice.
+func Info(ctx *fasthttp.RequestCtx, _ fasthttprouter.Params) {
 	routes := map[string]string{
 		"posts_url": "/api/post/:id",
 	}
 	resp, err := json.MarshalIndent(routes, "", "  ")
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(resp)
+	ctx.SetContentType("application/json")
+	ctx.Write(resp)
 }
 
 // SetPost is the API method for creating a new post.
-func SetPost(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func SetPost(ctx *fasthttp.RequestCtx, ps fasthttprouter.Params) {
 	v := struct {
 		Title string
 		Body  string
 	}{}
-	d := json.NewDecoder(r.Body)
-	err := d.Decode(&v)
+	err := json.Unmarshal(ctx.PostBody(), v)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
 		return
 	}
-	defer r.Body.Close()
+	defer ctx.Request.ConnectionClose()
 
 	p := model.NewPost(v.Title, v.Body)
 	id, err := p.Set(s)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte(id))
+	ctx.SetContentType("application/json")
+	ctx.WriteString(id)
 }
 
 // GetPost is the API method for getting a post.
-func GetPost(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func GetPost(ctx *fasthttp.RequestCtx, ps fasthttprouter.Params) {
 	id := ps.ByName("id")
 	post, err := model.Get(id, s)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusNotFound)
+		ctx.Error(err.Error(), fasthttp.StatusNotFound)
 		return
 	}
 
 	resp, err := json.MarshalIndent(post, "", "  ")
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(resp)
+	ctx.SetContentType("application/json")
+	ctx.Write(resp)
 }

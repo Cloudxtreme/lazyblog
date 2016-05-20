@@ -1,17 +1,16 @@
 package main
 
 import (
-	"net/http"
-
 	"github.com/bentranter/lazyblog/handler"
-	"github.com/julienschmidt/httprouter"
+	"github.com/buaazp/fasthttprouter"
+	"github.com/valyala/fasthttp"
 )
 
 func main() {
-	r := httprouter.New()
+	r := fasthttprouter.New()
 	r.GET("/api", handler.Info)
 	r.GET("/api/post/:id", handler.GetPost)
 	r.POST("/api/post", handler.SetPost)
 
-	http.ListenAndServe(":3000", r)
+	fasthttp.ListenAndServe(":3000", r.Handler)
 }
