@@ -47,7 +47,13 @@ func SetPost(ctx *fasthttp.RequestCtx, ps fasthttprouter.Params) {
 		return
 	}
 	ctx.SetContentType("application/json")
-	ctx.WriteString(id)
+	resp, err := json.MarshalIndent(map[string]string{
+		"id": id,
+	}, "", "  ")
+	if err != nil {
+		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
+	}
+	ctx.Write(resp)
 }
 
 // GetPost is the API method for getting a post.
