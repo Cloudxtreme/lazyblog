@@ -73,3 +73,8 @@ func GetPost(ctx *fasthttp.RequestCtx, ps fasthttprouter.Params) {
 	ctx.SetContentType("application/json")
 	ctx.Write(resp)
 }
+
+// GetAllPosts is a method for getting every post
+func GetAllPosts(ctx *fasthttp.RequestCtx, ps fasthttprouter.Params) {
+	ctx.WriteString("Not implemented")
+}
