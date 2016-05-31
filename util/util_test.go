@@ -6,10 +6,15 @@ import (
 
 func TestNewID(t *testing.T) {
 	t.Parallel()
-	id := NewID()
+	idA := NewID()
+	idB := NewID()
 
-	if len(id) < 8 {
-		t.Errorf("Failed to generate usable id, length is too short: %s\n", id)
+	if len(idA) < 8 {
+		t.Errorf("Failed to generate usable id, length is too short: %s\n", idA)
+	}
+
+	if idA == idB {
+		t.Errorf("IDs must be unique, but %s and %s are equal.\n", idA, idB)
 	}
 }
 
