@@ -2,16 +2,17 @@ package main
 
 import (
 	"github.com/bentranter/lazyblog/handler"
-	"github.com/buaazp/fasthttprouter"
-	"github.com/valyala/fasthttp"
+	"github.com/dinever/golf"
 )
 
 func main() {
-	r := fasthttprouter.New()
-	r.GET("/api", handler.Info)
-	r.GET("/api/posts", handler.GetAllPosts)
-	r.GET("/api/posts/:id", handler.GetPost)
-	r.POST("/api/posts", handler.SetPost)
+	app := golf.New()
 
-	fasthttp.ListenAndServe(":3000", r.Handler)
+	app.Get("/api", handler.Info)
+	app.Get("/api/posts", handler.GetAllPosts)
+	app.Get("/api/posts/:id", handler.GetPost)
+
+	app.Post("/api/posts", handler.SetPost)
+
+	app.Run(":3000")
 }

@@ -1,6 +1,8 @@
 package model
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"strings"
 	"time"
@@ -45,8 +47,23 @@ func (p *Post) Set(s Store) (string, error) {
 // Get retrieves a post from the chosen database, and returns the `Post` struct
 // for it.
 func Get(id string, s Store) (*Post, error) {
-	p, err := s.Get(id)
-	return p, err
+	var p *Post
+	data, err := s.Get(id)
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal(data.Bytes(), &p)
+	if err != nil {
+		return nil, err
+	}
+	return p, nil
+}
+
+// GetJSON retrieves a post from the chosen database, and returns the `Post` struct
+// for it.
+func GetJSON(id string, s Store) (*bytes.Buffer, error) {
+	return s.Get(id)
 }
 
 // GetAll retrieves every post from the chosen database, and returns every

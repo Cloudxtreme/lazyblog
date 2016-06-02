@@ -3,6 +3,7 @@
 package model
 
 import (
+	"bytes"
 	"encoding/json"
 	"time"
 
@@ -18,7 +19,7 @@ var (
 // between our models and any database.
 type Store interface {
 	Set(p *Post) (string, error)
-	Get(id string) (*Post, error)
+	Get(id string) (*bytes.Buffer, error)
 	GetAll() ([]*Post, error)
 }
 
@@ -73,7 +74,7 @@ func (b *Bolt) Set(p *Post) (string, error) {
 		rawBucket := tx.Bucket(boltRaw)
 		// cachedBucket := tx.Bucket(boltCached)
 
-		post, err := json.Marshal(p)
+		post, err := json.MarshalIndent(p, "", "  ")
 		if err != nil {
 			return err
 		}
@@ -84,23 +85,21 @@ func (b *Bolt) Set(p *Post) (string, error) {
 }
 
 // Get retrieves a post and marshals it into a struct.
-func (b *Bolt) Get(id string) (*Post, error) {
-	var p *Post
+func (b *Bolt) Get(id string) (*bytes.Buffer, error) {
+	var p []byte
 	err := b.db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket(boltRaw)
-		err := json.Unmarshal(bucket.Get([]byte(id)), &p)
-		if err != nil {
-			return err
-		}
+		p = bucket.Get([]byte(id))
 		return nil
 	})
 	if err != nil {
 		return nil, err
 	}
-	return p, nil
+	buf := bytes.NewBuffer(p)
+	return buf, nil
 }
 
-// GetAll returns evert post in the database, and returns them as an array of
+// GetAll returns every post in the database, and returns them as an array of
 // `Post` structs.
 func (b *Bolt) GetAll() ([]*Post, error) {
 	var posts []*Post
