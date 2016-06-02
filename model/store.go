@@ -4,7 +4,6 @@ package model
 
 import (
 	"encoding/json"
-	"fmt"
 	"time"
 
 	"github.com/boltdb/bolt"
@@ -114,7 +113,6 @@ func (b *Bolt) GetAll() ([]*Post, error) {
 		for id, postJSON := c.Last(); id != nil; id, postJSON = c.Prev() {
 			var post *Post
 			json.Unmarshal(postJSON, &post)
-			fmt.Printf("%d %s\n", id, postJSON)
 			posts = append(posts, post)
 		}
 		return nil
