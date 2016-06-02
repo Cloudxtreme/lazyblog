@@ -48,8 +48,8 @@ func TestBolt_Get(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error while retrieving saved post: %s\n", err.Error())
 	}
-	if id != px.ID {
-		t.Errorf("Retrieved post contains incorrect id: %d vs %d\n", id, px.ID)
+	if len(px) == 0 {
+		t.Errorf("Post doesn't exist")
 	}
 
 	if err = os.Remove(dbStr); err != nil {
