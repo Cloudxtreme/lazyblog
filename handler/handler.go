@@ -29,7 +29,7 @@ func Info(ctx *fasthttp.RequestCtx, _ fasthttprouter.Params) {
 
 // SetPost is the API method for creating a new post.
 func SetPost(ctx *fasthttp.RequestCtx, ps fasthttprouter.Params) {
-	v := struct {
+	v := &struct {
 		Title string
 		Body  string
 	}{}
@@ -76,5 +76,17 @@ func GetPost(ctx *fasthttp.RequestCtx, ps fasthttprouter.Params) {
 
 // GetAllPosts is a method for getting every post
 func GetAllPosts(ctx *fasthttp.RequestCtx, ps fasthttprouter.Params) {
-	ctx.WriteString("Not implemented")
+	posts, err := model.GetAll(s)
+	if err != nil {
+		ctx.Error(err.Error(), fasthttp.StatusNotFound)
+		return
+	}
+
+	resp, err := json.MarshalIndent(posts, "", "  ")
+	if err != nil {
+		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
+		return
+	}
+	ctx.SetContentType("application/json")
+	ctx.Write(resp)
 }
