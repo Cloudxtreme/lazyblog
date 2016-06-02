@@ -48,7 +48,7 @@ func TestBolt_Get(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error while retrieving saved post: %s\n", err.Error())
 	}
-	if len(px) == 0 {
+	if len(px.Bytes()) == 0 {
 		t.Errorf("Post doesn't exist")
 	}
 

@@ -1,6 +1,7 @@
 package model
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"strings"
@@ -52,7 +53,7 @@ func Get(id string, s Store) (*Post, error) {
 		return nil, err
 	}
 
-	err = json.Unmarshal(data, &p)
+	err = json.Unmarshal(data.Bytes(), &p)
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +62,7 @@ func Get(id string, s Store) (*Post, error) {
 
 // GetJSON retrieves a post from the chosen database, and returns the `Post` struct
 // for it.
-func GetJSON(id string, s Store) ([]byte, error) {
+func GetJSON(id string, s Store) (*bytes.Buffer, error) {
 	return s.Get(id)
 }
 
