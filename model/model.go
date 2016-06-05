@@ -1,13 +1,13 @@
 package model
 
 import (
-	"bytes"
-	"encoding/json"
+	// "encoding/json"
 	"errors"
 	"strings"
 	"time"
 
 	"github.com/bentranter/lazyblog/util"
+	// "github.com/russross/blackfriday"
 )
 
 var (
@@ -17,18 +17,24 @@ var (
 
 // Post is the struct that represents each post.
 type Post struct {
-	ID          string
-	Path        string // @TODO: Decide if path should be private
-	Title       string
-	Body        string
-	DateCreated int64
+	ID          []byte `json: "id"`
+	Path        string `json: "path"`
+	Title       string `json: "title"`
+	Body        string `json: "body"`
+	DateCreated int64  `json: "dateCreated"`
+}
+
+// A User represents a user.
+type User struct {
+	Username string
+	Password string
 }
 
 // NewPost returns a new post. It should be noted that `SavePost` must be
 // called to save the post to the DB.
 func NewPost(title string, body string) *Post {
 	return &Post{
-		ID:          util.NewID(),
+		ID:          []byte(util.NewID()),
 		Title:       title,
 		Body:        body,
 		DateCreated: time.Now().Unix(),
@@ -36,48 +42,40 @@ func NewPost(title string, body string) *Post {
 }
 
 // Set persists a post to the chosen database.
-func (p *Post) Set(s Store) (string, error) {
+func (p *Post) Set(s Store) ([]byte, error) {
 	err := p.urlify()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return s.Set(p)
+	return s.SetPost(p)
 }
 
-// Get retrieves a post from the chosen database, and returns the `Post` struct
-// for it.
-func Get(id string, s Store) (*Post, error) {
-	var p *Post
-	data, err := s.Get(id)
-	if err != nil {
-		return nil, err
-	}
+func Get(id []byte, s Store) (*Post, error) {
+	return nil, nil
+}
 
-	err = json.Unmarshal(data.Bytes(), &p)
-	if err != nil {
-		return nil, err
-	}
-	return p, nil
+// GetHTML returns the post HTML.
+func GetHTML(id []byte, s Store) ([]byte, error) {
+	return s.GetPostHTML(id)
 }
 
 // GetJSON retrieves a post from the chosen database, and returns the `Post` struct
 // for it.
-func GetJSON(id string, s Store) (*bytes.Buffer, error) {
-	return s.Get(id)
+func GetJSON(id []byte, s Store) ([]byte, error) {
+	return s.GetPostJSON(id)
 }
 
 // GetAll retrieves every post from the chosen database, and returns every
 // `Post` struct in there.
 func GetAll(s Store) ([]*Post, error) {
-	posts, err := s.GetAll()
-	return posts, err
+	return nil, nil
 }
 
 // urlify is a utility for making strings URL safe. It removes anything that
 // isn't a number or letter, and replaces each with a `-`. It then appends a
 // single "-" to the end, followed by the post ID.
 func (p *Post) urlify() error {
-	if p.ID == "" {
+	if p.ID == nil {
 		return ErrMissingPostID
 	}
 	if p.Title == "" {
@@ -100,6 +98,6 @@ func (p *Post) urlify() error {
 	}
 
 	bytebuf = append(bytebuf, '-')
-	p.Path = string(bytebuf) + p.ID
+	p.Path = string(bytebuf) + string(p.ID)
 	return nil
 }

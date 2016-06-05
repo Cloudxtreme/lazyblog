@@ -2,12 +2,8 @@ package model
 
 import (
 	"fmt"
-	"os"
-	"reflect"
 	"testing"
 	"time"
-
-	"github.com/bentranter/lazyblog/util"
 )
 
 func ExampleNewPost() {
@@ -25,76 +21,15 @@ func TestNewPost(t *testing.T) {
 	}
 }
 
-func TestPost_Set(t *testing.T) {
-	t.Parallel()
-	dbStr := util.RandStr() + ".db"
-	s := NewBolt(dbStr)
-	p := NewPost("Title", "Body")
-	id, err := p.Set(s)
-	if err != nil {
-		t.Errorf("Error when setting new post: %s\n", err.Error())
-	}
-	if len(id) < 8 {
-		t.Errorf("Saved Post ID doesn't meet length requirement of more than 8 characters: %s\n", id)
-	}
-
-	if err = os.Remove(dbStr); err != nil {
-		t.Logf("Info: Error removing test database: %s\n", err.Error())
-	}
-}
-
-func TestGet(t *testing.T) {
-	t.Parallel()
-	dbStr := util.RandStr() + ".db"
-	s := NewBolt(dbStr)
-	p := NewPost("Title", "Body")
-	p.Set(s)
-	px, err := Get(p.ID, s)
-
-	if err != nil {
-		t.Errorf("Error while getting post: %s\n", err.Error())
-	}
-	if !reflect.DeepEqual(p, px) {
-		t.Errorf("Posts do not match: %s %s\n", p.DateCreated, px.DateCreated)
-	}
-
-	if err = os.Remove(dbStr); err != nil {
-		t.Logf("Info: Error removing test database: %s\n", err.Error())
-	}
-}
-
-func TestGetAll(t *testing.T) {
-	t.Skip()
-	t.Parallel()
-	dbStr := util.RandStr() + ".db"
-	s := NewBolt(dbStr)
-	px := NewPost("Title", "Body")
-	px.Set(s)
-	py := NewPost("Title2", "Body2")
-	py.Set(s)
-	posts, err := GetAll(s)
-
-	if err != nil {
-		t.Errorf("Error while getting post: %s\n", err.Error())
-	}
-	if len(posts) != 2 {
-		t.Errorf("Did not get all posts, expected %d, got %d\n", 2, len(posts))
-	}
-
-	if err = os.Remove(dbStr); err != nil {
-		t.Logf("Info: Error removing test database: %s\n", err.Error())
-	}
-}
-
 func TestPost_urlify(t *testing.T) {
 	t.Parallel()
 	px := &Post{
-		ID:    "572b7220",
+		ID:    []byte("572b7220"),
 		Title: "mytest$1234+===((()",
 	}
 	px.urlify()
 	py := &Post{
-		ID:    "572b7220",
+		ID:    []byte("572b7220"),
 		Title: "my test with spaces",
 	}
 	py.urlify()
