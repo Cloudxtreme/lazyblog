@@ -47,7 +47,7 @@ func SetPost(ctx *golf.Context) {
 	}
 	ctx.Response.Header().Set("Content-Type", "application/json")
 	resp, err := json.MarshalIndent(map[string]string{
-		"id": id,
+		"id": string(id),
 	}, "", "  ")
 	if err != nil {
 		ctx.Abort(500)
@@ -55,16 +55,16 @@ func SetPost(ctx *golf.Context) {
 	ctx.Response.Write(resp)
 }
 
-// GetPost is the API method for getting a post.
-func GetPost(ctx *golf.Context) {
+// GetPostJSON is the API method for getting a post's JSON.
+func GetPostJSON(ctx *golf.Context) {
 	id := ctx.Param("id")
-	postJSON, err := model.GetJSON(id, s)
+	postJSON, err := model.GetJSON([]byte(id), s)
 	if err != nil {
 		ctx.Abort(404)
 		return
 	}
 	ctx.Response.Header().Set("Content-Type", "application/json")
-	postJSON.WriteTo(ctx.Response)
+	ctx.Response.Write(postJSON)
 }
 
 // GetAllPosts is a method for getting every post
