@@ -15,7 +15,7 @@ var s = model.NewBolt("prod.db")
 //        slice.
 func Info(ctx *golf.Context) {
 	routes := map[string]string{
-		"posts_url": "/api/post/:id",
+		"posts_url": "/api/posts{/id}",
 	}
 	resp, err := json.MarshalIndent(routes, "", "  ")
 	if err != nil {
