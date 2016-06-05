@@ -10,7 +10,7 @@ func main() {
 
 	app.Get("/api", handler.Info)
 	app.Get("/api/posts", handler.GetAllPosts)
-	app.Get("/api/posts/:id", handler.GetPost)
+	app.Get("/api/posts/:id", handler.GetPostJSON)
 
 	app.Post("/api/posts", handler.SetPost)
 
