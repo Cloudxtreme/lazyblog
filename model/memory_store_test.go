@@ -80,17 +80,26 @@ func TestMemoryStore_GetPosts(t *testing.T) {
 		t.Errorf("Failed to set post: %s\n", err.Error())
 	}
 
-	p, err := s.GetPosts(0, 0)
+	posts, err := s.GetPosts(0, 0)
 	if err != nil {
 		t.Errorf("Failed to get posts: %s\n", err.Error())
 	}
 
-	if p[0].Title != px.Title {
-		t.Errorf("Expected title to be %s, got %s\n", px.Title, p[0].Title)
+	f := func(a []*Post, b *Post) bool {
+		for _, post := range a {
+			if post.Title == b.Title {
+				return true
+			}
+		}
+		return false
 	}
 
-	if p[1].Title != py.Title {
-		t.Errorf("Expected title to be %s, got %s\n", px.Title, p[1].Title)
+	if !f(posts, px) {
+		t.Errorf("Expected %s to exist in %s\n", px.Title, posts)
+	}
+
+	if !f(posts, py) {
+		t.Errorf("Expected %s to exist in %s\n", py.Title, posts)
 	}
 }
 
