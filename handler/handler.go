@@ -7,7 +7,7 @@ import (
 	"github.com/dinever/golf"
 )
 
-var s = model.NewBolt("prod.db")
+var s = model.NewMemoryStore()
 
 // Info displays info about the available API routes.
 //
