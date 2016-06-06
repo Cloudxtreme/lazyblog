@@ -68,7 +68,7 @@ func GetJSON(id []byte, s Store) ([]byte, error) {
 // GetAll retrieves every post from the chosen database, and returns every
 // `Post` struct in there.
 func GetAll(s Store) ([]*Post, error) {
-	return nil, nil
+	return s.GetPosts(0, 0)
 }
 
 // urlify is a utility for making strings URL safe. It removes anything that
