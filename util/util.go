@@ -24,6 +24,8 @@ type flake struct {
 	lock sync.Mutex
 }
 
+// note: this failed on CI _once_, if it fails again try looking into the
+// timing + lock I guess
 func (f *flake) next() (string, error) {
 	f.lock.Lock()
 	defer f.lock.Unlock()
