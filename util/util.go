@@ -16,7 +16,7 @@ var (
 	ErrTimeIsGoingBackwards = errors.New("Time is running backwards on your machine.")
 )
 
-const nano = 1000 ^ 2
+const nano = 1000 * 1000
 
 type flake struct {
 	time uint64
@@ -30,7 +30,7 @@ func (f *flake) next() (string, error) {
 	f.lock.Lock()
 	defer f.lock.Unlock()
 
-	ts := uint64(time.Now().UnixNano() / nano)
+	ts := uint64(time.Now().Unix() / nano)
 	if ts == f.time {
 		f.seq = f.seq + 1
 	} else {
@@ -42,7 +42,7 @@ func (f *flake) next() (string, error) {
 	}
 	f.time = ts
 	id := make([]byte, 8)
-	binary.BigEndian.PutUint64(id, ts)
+	binary.BigEndian.PutUint64(id, ts<<f.seq)
 	return hex.EncodeToString(id), nil
 }
 
