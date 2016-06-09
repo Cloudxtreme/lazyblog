@@ -14,8 +14,8 @@ import (
 )
 
 var (
-	httpAddr  = flag.String("http", ":3000", "HTTP service address")
-	pprofAddr = flag.String("pprof", ":8080", "pprof service address")
+	httpAddr  = flag.String("http", "8000", "HTTP service address")
+	pprofAddr = flag.String("pprof", "3000", "pprof service address")
 )
 
 func main() {
@@ -39,10 +39,10 @@ func main() {
 	})
 
 	go func() {
-		errCh <- http.ListenAndServe(":8080", nil)
+		errCh <- http.ListenAndServe(":"+*httpAddr, r)
 	}()
 	go func() {
-		errCh <- http.ListenAndServe(":3000", r)
+		errCh <- http.ListenAndServe(":"+*pprofAddr, nil)
 	}()
 
 	signalCh := make(chan os.Signal, 1)
