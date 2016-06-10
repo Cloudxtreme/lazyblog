@@ -59,6 +59,26 @@ When you submit a completed blog post, that post (along with its template) are r
 Benchmark Results
 ---
 
+**New Version**
+
+```
+Running 30s test @ http://localhost:8000
+  8 threads and 32 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency     6.18ms    5.16ms  65.08ms   76.06%
+    Req/Sec    28.54k     4.13k   66.72k    71.33%
+  Latency Distribution
+     50%    5.15ms
+     75%    8.97ms
+     90%   14.04ms
+     99%    0.00us
+  6829077 requests in 30.10s, 1.93GB read
+Requests/sec: 226880.28
+Transfer/sec:     65.56MB
+```
+
+**Old Version**
+
 **Cached post**:
 
 ```

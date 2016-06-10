@@ -10,11 +10,12 @@ import (
 
 var s = model.NewBolt("dev_bolt.db")
 
-// Info displays info about the available API routes.
-func Info(ctx *fasthttp.RequestCtx, _ fasthttprouter.Params) {
-	routes := `{
+const routes = `{
   "posts_url": "/api/posts{/id}"
 }`
+
+// Info displays info about the available API routes.
+func Info(ctx *fasthttp.RequestCtx, _ fasthttprouter.Params) {
 	ctx.Response.Header.Set("Content-Type", "application/json")
 	ctx.WriteString(routes)
 }

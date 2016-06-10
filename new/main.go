@@ -16,7 +16,7 @@ import (
 
 var (
 	httpAddr  = flag.String("http", "8000", "HTTP service address")
-	pprofAddr = flag.String("pprof", "3000", "pprof service address")
+	pprofAddr = flag.String("pprof", "8080", "pprof service address")
 )
 
 func main() {
