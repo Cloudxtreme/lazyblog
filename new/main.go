@@ -10,7 +10,8 @@ import (
 	"syscall"
 
 	"github.com/bentranter/lazyblog/handler"
-	"github.com/julienschmidt/httprouter"
+	"github.com/buaazp/fasthttprouter"
+	"github.com/valyala/fasthttp"
 )
 
 var (
@@ -21,7 +22,7 @@ var (
 func main() {
 	flag.Parse()
 
-	r := httprouter.New()
+	r := fasthttprouter.New()
 	errCh := make(chan error, 10)
 
 	log.Printf("Starting HTTP server on port %s\n", *httpAddr)
@@ -31,7 +32,7 @@ func main() {
 	r.GET("/api/posts", handler.GetAllPosts)
 	r.GET("/api/posts/:id", handler.GetPostJSON)
 	r.POST("/api/posts", handler.SetPost)
-	r.ServeFiles("/static/*filepath", http.Dir("./static"))
+	r.ServeFiles("/static/*filepath", "./static")
 
 	// pprof server
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -39,7 +40,7 @@ func main() {
 	})
 
 	go func() {
-		errCh <- http.ListenAndServe(":"+*httpAddr, r)
+		errCh <- fasthttp.ListenAndServe(":"+*httpAddr, r.Handler)
 	}()
 	go func() {
 		errCh <- http.ListenAndServe(":"+*pprofAddr, nil)
