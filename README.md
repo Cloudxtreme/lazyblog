@@ -22,6 +22,8 @@ To run the old, working code, navigate to the `cmd` directory and use either `go
 
 If you want to try the new stuff, use the same commands in the top level of this repo. It'll use the `main.go` file there.
 
+If that's not enough, check out of the work-in progress branches. Those branches have been benchmarked around 275,000 req/sec with the hope of getting up to 450,000 req/sec before merging back to master.
+
 Usage
 ---
 
