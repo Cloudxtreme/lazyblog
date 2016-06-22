@@ -153,7 +153,7 @@ func AuthenticatedRoute(next httprouterHandler) httprouter.Handle {
 func AdminHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	err := t.ExecuteTemplate(w, "admin", GetAll())
 	if err != nil {
-		log.Printf("Error rendering login template: ", err.Error())
+		log.Printf("Error rendering login template: %s\n", err.Error())
 	}
 }
 
@@ -161,7 +161,7 @@ func AdminHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) 
 func LoginHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	err := t.ExecuteTemplate(w, "login", nil)
 	if err != nil {
-		log.Printf("Error rendering login template: ", err.Error())
+		log.Printf("Error rendering login template: %s\n", err.Error())
 	}
 }
 
@@ -234,11 +234,11 @@ func NewDefaultMux() *httprouter.Router {
 }
 
 func genToken() (string, error) {
-	tok := jwt.New(jwt.SigningMethodHS256)
-
-	tok.Claims["sub"] = "admin"
-	tok.Claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
-	tok.Claims["iat"] = time.Now().Unix()
+	tok := jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.StandardClaims{
+		ExpiresAt: time.Now().Add(time.Hour * 72).Unix(),
+		IssuedAt:  time.Now().Unix(),
+		Subject:   "admin",
+	})
 
 	return tok.SignedString(signingKey)
 }
@@ -259,7 +259,8 @@ func verifyToken(tokStr string) error {
 		return ErrInvalidToken
 	}
 
-	if int64(tok.Claims["exp"].(float64)) < time.Now().Unix() {
+	err = tok.Claims.Valid()
+	if err != nil {
 		return ErrExpiredToken
 	}
 
